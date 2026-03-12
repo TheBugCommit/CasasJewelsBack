@@ -19,5 +19,17 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    #Cache
+    Symfony\Component\Cache\Adapter\ApcuAdapter: ~
+    Predis\Client:
+        factory: [ 'Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection' ]
+        arguments:
+            - '%env(REDIS_DSN)%'
+
+    #Repositories
+    App\Infrastructure\Persistence\DoctrineProductRepository: ~
+    App\Infrastructure\Persistence\CachedProductRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Persistence\DoctrineProductRepository'
+    App\Domain\Repository\ProductRepositoryInterface:
+        alias: App\Infrastructure\Persistence\CachedProductRepository
