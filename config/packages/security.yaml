@@ -46,26 +46,25 @@ security:
         admin_provider:
             id: App\Infrastructure\Security\Providers\AdminUserProvider
 
-        # Virtual provider for API-key clients (no DB lookup needed)
-        #api_key_provider:
-        #    memory:
-        #        users:
-        #            api_client: { roles: ['ROLE_API'] }
+        api_key_provider:
+            memory:
+                users:
+                    api_client: { roles: ['ROLE_API'] }
 
     firewalls:
         dev:
             pattern: ^/(_profiler|_wdt|assets|build|css|images|js)/
             security: false
 
-        # ── Public API firewall (/api/*) ── API-key only ──────────────────────
-        #api:
-        #    pattern: ^/api
-        #    stateless: true
-        #    provider: api_key_provider
-        #    custom_authenticators:
-        #        - App\Infrastructure\Security\ApiKeyAuthenticator
+        # API firewall
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: api_key_provider
+            custom_authenticators:
+                - App\Infrastructure\Api\Security\ApiKeyAuthenticator
 
-        # ── Admin backoffice firewall (/admin/*) ── session form-login ────────
+        # Admin firewall
         admin:
             pattern: ^/admin
             lazy: true
@@ -82,4 +81,4 @@ security:
     access_control:
         - { path: ^/admin/login,  roles: PUBLIC_ACCESS }
         - { path: ^/admin,        roles: ROLE_ADMIN }
-        #- { path: ^/api,          roles: ROLE_API }
+        - { path: ^/api,          roles: ROLE_API }

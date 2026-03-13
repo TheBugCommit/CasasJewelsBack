@@ -14,13 +14,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-/**
- * Validates the X-API-KEY header for public API endpoints (/api/*).
- * Configure the expected key in services.yaml:
- *
- *   App\Infrastructure\Security\ApiKeyAuthenticator:
- *       arguments: ['%env(API_KEY)%']
- */
 final class ApiKeyAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
