@@ -56,6 +56,6 @@ final class DoctrineProductRepository implements ProductRepositoryInterface
             ->where('p.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 }

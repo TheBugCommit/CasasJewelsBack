@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backoffice — Accés</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        h1 { font-size: 1.4rem; color: #111827; margin-bottom: 1.5rem; text-align: center; }
+
+        .alert {
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 6px;
+            padding: .75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: .9rem;
+        }
+
+        label { display: block; font-size: .85rem; color: #374151; margin-bottom: .3rem; }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: .6rem .85rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color .2s;
+            margin-bottom: 1rem;
+        }
+
+        input:focus { outline: none; border-color: #6366f1; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: .7rem;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        button[type="submit"]:hover { background: #4f46e5; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🔐 Backoffice</h1>
+
+    {% if error %}
+        <div class="alert">{{ error.messageKey | trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ path('admin_login') }}">
+        <label for="email">Correu electrònic</label>
+        <input type="email"
+               id="email"
+               name="_username"
+               value="{{ last_username }}"
+               autocomplete="email"
+               required>
+
+        <label for="password">Contrasenya</label>
+        <input type="password"
+               id="password"
+               name="_password"
+               autocomplete="current-password"
+               required>
+
+        {# CSRF token — Symfony injects this automatically #}
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button type="submit">Accedir</button>
+    </form>
+</div>
+</body>
+</html>

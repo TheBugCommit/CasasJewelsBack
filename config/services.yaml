@@ -26,6 +26,10 @@ services:
         arguments:
             - '%env(REDIS_DSN)%'
 
+    #API Security
+    App\Infrastructure\Api\Security\ApiKeyAuthenticator:
+        arguments: [ '%env(API_KEY)%' ]
+
     #Repositories
     App\Infrastructure\Persistence\DoctrineProductRepository: ~
     App\Infrastructure\Persistence\CachedProductRepository:
