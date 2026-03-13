@@ -11,5 +11,7 @@ interface ProductRepositoryInterface
     /** @return Product[] */
     public function findByIds(array $ids): array;
 
+    public function findById(string $id): Product;
+
     public function countAll(): int;
 }

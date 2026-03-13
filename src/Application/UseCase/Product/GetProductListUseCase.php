@@ -20,6 +20,6 @@ final class GetProductListUseCase
         $products = $this->products->findByIds($ids);
         $total    = $this->products->countAll();
 
-        return $this->mapper->toProductListDTO($products, $total, $request);
+        return $this->mapper->toProductListResponseDTO($products, $total, $request);
     }
 }

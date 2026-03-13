@@ -10,7 +10,7 @@ final class LayeredCache
     ) {}
 
     /**
-     * Patrón APCu → Redis → fallback, reutilizable en cualquier caso de uso.
+     * APCu → Redis → fallback
      *
      * @template T
      * @param callable(): T $fallback
@@ -22,22 +22,17 @@ final class LayeredCache
         int      $redisTtl,
         callable $fallback,
     ): mixed {
-        // Nivel 1: APCu
         $value = $this->apcu->get($key);
         if ($value !== null) {
-
             return $value;
         }
 
-        // Nivel 2: Redis → warm-up APCu
         $value = $this->redis->get($key);
         if ($value !== null) {
             $this->apcu->set($key, $value, $apCuTtl);
-
             return $value;
         }
 
-        // Nivel 3: fallback (BD) → guardar en ambas capas
         $value = $fallback();
         $this->store($key, $value, $apCuTtl, $redisTtl);
 

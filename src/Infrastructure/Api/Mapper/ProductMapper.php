@@ -4,13 +4,14 @@ namespace App\Infrastructure\Api\Mapper;
 
 use App\Domain\Entity\Product;
 use Sce\CasasJewelsVendor\DTO\Entity\ProductDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductDetailResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListResponseDTO;
 
 final class ProductMapper
 {
     /** @param Product[] $products */
-    public function toProductListDTO(
+    public function toProductListResponseDTO(
         array                $products,
         int                  $total,
         GetProductListRequestDTO $request,
@@ -21,6 +22,12 @@ final class ProductMapper
             offset:     $request->offset,
             limit:      $request->limit,
             totalPages: (int) ceil($total / $request->limit),
+        );
+    }
+    public function toProductResponseDTO(Product $product): GetProductDetailResponseDTO
+    {
+        return new GetProductDetailResponseDTO(
+            data: $this->toProductDTO($product),
         );
     }
 
