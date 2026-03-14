@@ -3,6 +3,7 @@
 namespace App\Domain\Repository;
 
 use App\Domain\Entity\Order;
+use App\Domain\Model\PaginatedOrderList;
 
 interface OrderRepositoryInterface
 {
@@ -10,6 +11,5 @@ interface OrderRepositoryInterface
 
     public function findById(string $id): Order;
 
-    /** @return Order[] */
-    public function findAll(): array;
+    public function findPaginated(int $limit, int $offset): PaginatedOrderList;
 }
