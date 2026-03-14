@@ -6,6 +6,7 @@ namespace App\Infrastructure\Controller;
 
 use App\Application\UseCase\Product\GetProductDetailUseCase;
 use App\Application\UseCase\Product\GetProductListUseCase;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductDetailRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
