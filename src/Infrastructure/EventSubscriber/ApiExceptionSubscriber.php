@@ -12,9 +12,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ApiExceptionSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly SerializerInterface $serializer)
-    {
-    }
+    public function __construct(
+        private readonly SerializerInterface $serializer
+    )
+    {}
 
     public function onKernelException(ExceptionEvent $event): void
     {
