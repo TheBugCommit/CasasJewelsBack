@@ -47,6 +47,30 @@ final class SymfonyEmailService implements EmailServiceInterface
     /**
      * @throws TransportExceptionInterface
      */
+    public function sendOrderDelivering(Order $order): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address($this->senderEmail, $this->senderName))
+            ->to($order->getClientEmail())
+            ->subject('La teva comanda ha estat enviada')
+            ->htmlTemplate('emails/order_delivering.html.twig')
+            ->context([
+                'order'      => $order,
+                'clientName' => $order->getClientName(),
+                'orderId'    => $order->getId(),
+                'paymentUrl' => $order->getPaymentUrl(),
+                'lines'      => $order->getLines(),
+                'total'      => $order->getTotalAmount(),
+                'status'     => $order->getStatus()->value,
+                'createdAt'  => $order->getCreatedAt()->format('d/m/Y H:i'),
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function sendOrderDelivered(Order $order): void
     {
         $email = (new TemplatedEmail())

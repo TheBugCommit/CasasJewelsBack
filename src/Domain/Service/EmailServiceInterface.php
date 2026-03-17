@@ -9,6 +9,7 @@ use App\Domain\Entity\Order;
 interface EmailServiceInterface
 {
     public function sendOrderCreated(Order $order): void;
+    public function sendOrderDelivering(Order $order): void;
 
     public function sendOrderDelivered(Order $order): void;
 }
