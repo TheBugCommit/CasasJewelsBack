@@ -21,7 +21,7 @@ class OrderController extends AbstractController
         private readonly SerializerInterface $serializer,
     ) {}
 
-    #[Route('', methods: ['POST'])]
+    #[Route('', methods: ['PUT','POST'])]
     public function create(#[MapRequestPayload] CreateOrderRequestDTO $request): JsonResponse
     {
         $response = $this->createOrder->execute($request);

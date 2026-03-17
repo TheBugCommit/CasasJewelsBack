@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\EventSubscriber;
 
+use App\Application\Exception\Orders\ProductNotFoundException;
 use Sce\CasasJewelsVendor\DTO\ErrorResponseDTO;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,24 +27,19 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
         $exception = $event->getThrowable();
 
-        $statusCode = 500;
-        $message = 'Internal server Error.';
+        $statusCode = match (true) {
+            $exception instanceof ProductNotFoundException => 404,
+            $exception instanceof \InvalidArgumentException => 400,
+            $exception instanceof \DomainException => 422,
+            $exception instanceof HttpExceptionInterface => $exception->getStatusCode(),
+            default => 500,
+        };
 
-        if ($exception instanceof \InvalidArgumentException) {
-            $statusCode = 400;
-            $message = $exception->getMessage();
+        $message = $statusCode === 500
+            ? 'Internal server Error.'
+            : $exception->getMessage();
 
-        } elseif ($exception instanceof \DomainException) {
-            $statusCode = 422;
-            $message = $exception->getMessage();
-
-        } elseif ($exception instanceof HttpExceptionInterface) {
-            $statusCode = $exception->getStatusCode();
-            $message = $exception->getMessage();
-        }
-
-
-        $response = new ErrorResponseDTO($statusCode, $message);
+        $response = new ErrorResponseDTO($statusCode, $message, $exception->getTrace());
         $jsonResponse = $this->serializer->serialize($response, 'json');
         $response = new JsonResponse($jsonResponse, $statusCode, [], true);
 

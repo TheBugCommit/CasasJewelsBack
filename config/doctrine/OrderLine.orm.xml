@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Domain\Entity\OrderLine" table="order_lines">
+
+        <id name="id" type="uuid" length="36">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="productId" type="string" length="36" />
+        <field name="quantity" type="integer" />
+        <field name="unitPrice" type="float" />
+
+        <many-to-one field="order" target-entity="App\Domain\Entity\Order" inversed-by="lines">
+            <join-column name="order_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+        </many-to-one>
+
+    </entity>
+</doctrine-mapping>

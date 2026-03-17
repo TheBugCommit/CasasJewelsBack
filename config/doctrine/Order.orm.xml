@@ -2,13 +2,12 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
-                                      http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-
+                                      https://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity name="App\Domain\Entity\Order" table="orders">
         <id name="id" type="uuid" length="36">
             <generator strategy="NONE"/>
         </id>
-        <field name="productId" column="product_id" type="uuid" length="36"/>
+
         <field name="clientName" column="client_name" type="string" length="255"/>
         <field name="clientEmail" column="client_email" type="string" length="255"/>
 
@@ -18,5 +17,12 @@
 
         <field name="transactionId" column="transaction_id" type="string" length="255"/>
         <field name="paymentUrl" column="payment_url" type="string" length="2048"/>
+
+        <one-to-many field="lines" target-entity="App\Domain\Entity\OrderLine" mapped-by="order" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
     </entity>
 </doctrine-mapping>
