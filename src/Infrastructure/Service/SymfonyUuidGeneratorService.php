@@ -5,7 +5,7 @@ namespace App\Infrastructure\Service;
 use App\Domain\Service\UuidGeneratorInterface;
 use Symfony\Component\Uid\Uuid;
 
-final class SymfonyUuidGenerator implements UuidGeneratorInterface
+final class SymfonyUuidGeneratorService implements UuidGeneratorInterface
 {
     public function generate(): string
     {
