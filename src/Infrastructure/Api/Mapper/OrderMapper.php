@@ -7,6 +7,7 @@ use Sce\CasasJewelsVendor\DTO\Entity\OrderDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\CreateOrder\CreateOrderResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListResponseDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusResponseDTO;
 
 final class OrderMapper
 {
@@ -36,6 +37,14 @@ final class OrderMapper
             offset: $request->offset,
             limit: $request->limit,
             totalPages: (int)ceil($totalItems / $request->limit),
+        );
+    }
+
+    public function toUpdateOrderStatusResponseDTO(Order $order): UpdateOrderStatusResponseDTO
+    {
+        return new UpdateOrderStatusResponseDTO(
+            orderId: $order->getId(),
+            status: $order->getStatus()->value,
         );
     }
 }
