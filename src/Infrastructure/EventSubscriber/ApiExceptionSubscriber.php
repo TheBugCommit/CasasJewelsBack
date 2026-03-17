@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\EventSubscriber;
 
-use App\Application\Exception\Orders\ProductNotFoundException;
+use App\Application\Exception\ProductNotFoundException;
 use Sce\CasasJewelsVendor\DTO\ErrorResponseDTO;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
