@@ -6,6 +6,7 @@ use App\Application\Exception\ProductNotFoundException;
 use App\Domain\Entity\Order;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
+use App\Domain\Service\EmailServiceInterface;
 use App\Domain\Service\UuidGeneratorInterface;
 use App\Infrastructure\Api\Mapper\OrderMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\CreateOrder\CreateOrderRequestDTO;
@@ -17,7 +18,8 @@ final class CreateOrderUseCase
         private readonly OrderMapper $orderMapper,
         private readonly OrderRepositoryInterface $orders,
         private readonly ProductRepositoryInterface $products,
-        private readonly UuidGeneratorInterface $uuidGenerator
+        private readonly UuidGeneratorInterface $uuidGenerator,
+        private readonly EmailServiceInterface $emailService,
     ) {}
 
     public function execute(CreateOrderRequestDTO $request): CreateOrderResponseDTO
@@ -28,8 +30,9 @@ final class CreateOrderUseCase
         $transactionId = "123";
         $paymentUrl = "http://1234";
 
+        $orderId = $this->uuidGenerator->generate();
         $order = Order::create(
-            id:            $this->uuidGenerator->generate(),
+            id:            $orderId,
             clientName:    $request->clientName,
             clientEmail:   $request->clientEmail,
             transactionId: $transactionId,
@@ -56,6 +59,7 @@ final class CreateOrderUseCase
         }
 
         $this->orders->save($order); #TODO: Queue Batch Insert
+        $this->emailService->sendOrderCreated($order);
 
         return $this->orderMapper->toCreateOrderResponseDTO($order);
     }

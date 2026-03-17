@@ -45,3 +45,24 @@ services:
         arguments:
             $apcu: '@App\Infrastructure\Cache\APCuCache'
             $redis: '@App\Infrastructure\Cache\RedisCache'
+
+    #PayPal
+    App\Infrastructure\Service\PaypalPaymentService:
+        arguments:
+            $clientId: '%env(PAYPAL_CLIENT_ID)%'
+            $clientSecret: '%env(PAYPAL_CLIENT_SECRET)%'
+            $baseUrl: '%env(PAYPAL_BASE_URL)%'
+            $returnUrl: '%env(PAYPAL_RETURN_URL)%'
+            $cancelUrl: '%env(PAYPAL_CANCEL_URL)%'
+
+    App\Domain\Service\PaymentServiceInterface:
+        alias: App\Infrastructure\Service\PaypalPaymentService
+
+    # Email
+    App\Infrastructure\Service\SymfonyEmailService:
+        arguments:
+            $senderEmail: '%env(MAILER_SENDER_EMAIL)%'
+            $senderName: '%env(MAILER_SENDER_NAME)%'
+
+    App\Domain\Service\EmailServiceInterface:
+        alias: App\Infrastructure\Service\SymfonyEmailService
