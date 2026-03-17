@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\Order;
 
-use App\Application\Exception\Orders\ProductNotFoundException;
+use App\Application\Exception\ProductNotFoundException;
 use App\Domain\Entity\Order;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
