@@ -69,16 +69,24 @@ security:
             pattern: ^/admin
             lazy: true
             provider: admin_provider
+
+            json_login:
+                check_path: admin_json_login
+                username_path: email
+                password_path: password
+
             form_login:
                 login_path:    admin_login
                 check_path:    admin_login
                 default_target_path: /
                 enable_csrf:   true
+
             logout:
                 path: admin_logout
                 target: admin_login
 
     access_control:
         - { path: ^/admin/login,  roles: PUBLIC_ACCESS }
+        - { path: ^/admin/api,    roles: PUBLIC_ACCESS }
         - { path: ^/admin,        roles: ROLE_ADMIN }
         - { path: ^/api,          roles: ROLE_API }

@@ -5,22 +5,13 @@ namespace App\Infrastructure\Cache;
 final class LayeredCache
 {
     public function __construct(
-        private readonly APCuCache  $apcu,
-        private readonly RedisCache $redis,
+        private readonly CacheInterface  $apcu,
+        private readonly CacheInterface $redis,
     ) {}
 
-    /**
-     * APCu → Redis → fallback
-     *
-     * @template T
-     * @param callable(): T $fallback
-     * @return T
-     */
-    public function remember(
+    public function get(
         string   $key,
         int      $apCuTtl,
-        int      $redisTtl,
-        callable $fallback,
     ): mixed {
         $value = $this->apcu->get($key);
         if ($value !== null) {
@@ -33,16 +24,40 @@ final class LayeredCache
             return $value;
         }
 
-        $value = $fallback();
-        $this->store($key, $value, $apCuTtl, $redisTtl);
-
-        return $value;
+        return null;
     }
 
-    public function store(string $key, mixed $value, int $apCuTtl, int $redisTtl): void
+    public function set(string $key, mixed $value, int $apCuTtl, int $redisTtl): void
     {
         $this->apcu->set($key, $value, $apCuTtl);
         $this->redis->set($key, $value, $redisTtl);
+    }
+
+    public function getMultiple(array $keys, int $apCuTtl): array
+    {
+        if (empty($keys)) return [];
+
+        $result = $this->apcu->getMultiple($keys);
+        $missingKeys = array_values(array_diff($keys, array_keys($result)));
+        if (empty($missingKeys)) {
+            return $result;
+        }
+
+        $redisFound = $this->redis->getMultiple($missingKeys);
+        if (!empty($redisFound)) {
+            $this->apcu->setMultiple($redisFound, $apCuTtl);
+            $result = array_merge($result, $redisFound);
+        }
+
+        return $result;
+    }
+
+    public function setMultiple(array $values, int $apCuTtl, int $redisTtl): void
+    {
+        if (empty($values)) return;
+
+        $this->apcu->setMultiple($values, $apCuTtl);
+        $this->redis->setMultiple($values, $redisTtl);
     }
 
     public function invalidate(string $key): void

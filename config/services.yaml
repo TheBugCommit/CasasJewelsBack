@@ -40,3 +40,8 @@ services:
             $inner: '@App\Infrastructure\Persistence\DoctrineProductRepository'
     App\Domain\Repository\ProductRepositoryInterface:
         alias: App\Infrastructure\Persistence\CachedProductRepository
+
+    App\Infrastructure\Cache\LayeredCache:
+        arguments:
+            $apcu: '@App\Infrastructure\Cache\APCuCache'
+            $redis: '@App\Infrastructure\Cache\RedisCache'

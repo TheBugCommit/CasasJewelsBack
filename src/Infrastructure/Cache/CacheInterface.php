@@ -7,4 +7,6 @@ interface CacheInterface
     public function get(string $key): mixed;
     public function set(string $key, mixed $value, int $ttl): void;
     public function delete(string $key): void;
+    public function getMultiple(array $keys): array;
+    public function setMultiple(array $items, int $ttl): void;
 }

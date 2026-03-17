@@ -25,4 +25,32 @@ final class RedisCache implements CacheInterface
     {
         $this->redis->del($key);
     }
+
+    public function getMultiple(array $keys): array
+    {
+        if (empty($keys)) return [];
+
+        $rawValues = $this->redis->mget($keys);
+        $found = [];
+
+        foreach ($keys as $index => $key) {
+            $raw = $rawValues[$index];
+            if (is_string($raw)) {
+                $found[$key] = unserialize($raw);
+            }
+        }
+
+        return $found;
+    }
+
+    public function setMultiple(array $items, int $ttl): void
+    {
+        if (empty($items)) return;
+
+        $this->redis->pipeline(function ($pipe) use ($items, $ttl) {
+            foreach ($items as $key => $value) {
+                $pipe->setex($key, $ttl, serialize($value));
+            }
+        });
+    }
 }
