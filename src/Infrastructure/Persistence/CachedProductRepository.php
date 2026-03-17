@@ -80,14 +80,17 @@ final class CachedProductRepository implements ProductRepositoryInterface
         return $productCount;
     }
 
-    public function findById(string $id): Product
+    public function findById(string $id): Product|null
     {
         $key = "product:stable:{$id}";
         $product = $this->cache->get($key, self::PRODUCT_APCU);
         if(!$product) {
             $product = $this->inner->findById($id);
-            $this->cache->set($key,$product, self::PRODUCT_APCU, self::PRODUCT_REDIS);
+            if($product) {
+                $this->cache->set($key, $product,self::PRODUCT_APCU, self::PRODUCT_REDIS);
+            }
         }
+
         return $product;
     }
 }

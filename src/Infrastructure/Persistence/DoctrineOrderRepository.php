@@ -21,15 +21,9 @@ final class DoctrineOrderRepository implements OrderRepositoryInterface
         $this->em->flush();
     }
 
-    public function findById(string $id): Order
+    public function findById(string $id): Order|null
     {
-        $order = $this->em->getRepository(Order::class)->find($id);
-
-        if ($order === null) {
-            throw new RuntimeException("Order '{$id}' not found.");
-        }
-
-        return $order;
+        return $this->em->getRepository(Order::class)->find($id);
     }
 
     public function findPaginated(int $limit, int $offset): PaginatedOrderList

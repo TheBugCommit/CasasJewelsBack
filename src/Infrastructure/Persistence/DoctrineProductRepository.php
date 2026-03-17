@@ -48,7 +48,7 @@ final class DoctrineProductRepository implements ProductRepositoryInterface
             ->getSingleScalarResult();
     }
 
-    public function findById(string $id): Product
+    public function findById(string $id): Product|null
     {
         return $this->em->createQueryBuilder()
             ->select('p')

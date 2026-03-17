@@ -39,7 +39,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             ? 'Internal server Error.'
             : $exception->getMessage();
 
-        $response = new ErrorResponseDTO($statusCode, $message, $exception->getTrace());
+        $response = new ErrorResponseDTO($statusCode, $message);
         $jsonResponse = $this->serializer->serialize($response, 'json');
         $response = new JsonResponse($jsonResponse, $statusCode, [], true);
 

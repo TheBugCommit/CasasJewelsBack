@@ -32,7 +32,7 @@ final class OrderMapper
     public function toOrderListResponseDTO(array $items, int $totalItems, GetOrderListRequestDTO $request): GetOrderListResponseDTO
     {
         return new GetOrderListResponseDTO(
-            items: $items,
+            items: array_map(fn($item) => $this->toOrderDTO($item), $items),
             total: $totalItems,
             offset: $request->offset,
             limit: $request->limit,

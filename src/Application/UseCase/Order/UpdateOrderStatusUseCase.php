@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\Order;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Api\Mapper\OrderMapper;
@@ -20,6 +21,10 @@ final class UpdateOrderStatusUseCase
     public function execute(UpdateOrderStatusRequestDTO $request): UpdateOrderStatusResponseDTO
     {
         $order = $this->orderRepository->findById($request->orderId);
+        if(!$order){
+            throw OrderNotFoundException::withId($request->orderId);
+        }
+
         $newStatus = OrderStatus::from($request->status);
 
         $order->transitionTo($newStatus);

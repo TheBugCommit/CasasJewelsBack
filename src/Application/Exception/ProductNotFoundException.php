@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Exception\Orders;
+namespace App\Application\Exception;
 
 final class ProductNotFoundException extends \RuntimeException
 {
