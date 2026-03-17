@@ -71,7 +71,7 @@ security:
             provider: admin_provider
 
             json_login:
-                check_path: admin_json_login
+                check_path: admin_api_login
                 username_path: email
                 password_path: password
 
