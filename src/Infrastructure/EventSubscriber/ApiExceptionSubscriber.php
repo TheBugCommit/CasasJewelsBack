@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 class ApiExceptionSubscriber implements EventSubscriberInterface
 {
@@ -39,7 +40,20 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             ? 'Internal server Error.'
             : $exception->getMessage();
 
-        $response = new ErrorResponseDTO($statusCode, $message);
+        $details = [];
+        if ($exception instanceof HttpExceptionInterface
+                && $exception->getPrevious() instanceof ValidationFailedException) {
+            /** @var ValidationFailedException $validationException */
+            $validationException = $exception->getPrevious();
+
+            $message = "Error de validació en els paràmetres.";
+
+            foreach ($validationException->getViolations() as $violation) {
+                $details[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+            }
+        }
+
+        $response = new ErrorResponseDTO($statusCode, $message, $details);
         $jsonResponse = $this->serializer->serialize($response, 'json');
         $response = new JsonResponse($jsonResponse, $statusCode, [], true);
 
