@@ -24,7 +24,8 @@ services:
 
     #Cache
     Symfony\Component\Cache\Adapter\ApcuAdapter: ~
-    Predis\Client:
+    Redis:
+        class: Redis
         factory: [ 'Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection' ]
         arguments:
             - '%env(REDIS_DSN)%'

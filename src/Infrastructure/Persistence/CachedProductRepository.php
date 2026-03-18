@@ -22,7 +22,7 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
     public function findIdsPaginated(int $limit, int $offset): array
     {
-        $key = "products:ids:{$offset}:{$limit}";
+        $key = "products_ids_{$offset}_{$limit}";
         $pageIds = $this->cache->get($key, self::IDS_APCU);
         if(!$pageIds) {
             $pageIds = $this->inner->findIdsPaginated($limit, $offset);
@@ -37,7 +37,7 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
         $keysToIds = [];
         foreach ($ids as $id) {
-            $keysToIds["product:stable:{$id}"] = $id;
+            $keysToIds["product_stable_{$id}"] = $id;
         }
 
         $keysToSearch = array_keys($keysToIds);
@@ -56,7 +56,7 @@ final class CachedProductRepository implements ProductRepositoryInterface
             foreach ($fromDb as $product) {
                 $id = $product->getId();
                 $result[$id] = $product;
-                $toCache["product:stable:{$id}"] = $product;
+                $toCache["product_stable_{$id}"] = $product;
             }
 
             if (!empty($toCache)) {
@@ -71,7 +71,7 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
     public function countAll(): int
     {
-        $key = "products:count";
+        $key = "products_count";
         $productCount = $this->cache->get($key, self::COUNT_APCU);
         if(!$productCount) {
             $productCount = $this->inner->countAll();
@@ -82,7 +82,7 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
     public function findById(string $id): Product|null
     {
-        $key = "product:stable:{$id}";
+        $key = "product_stable_{$id}";
         $product = $this->cache->get($key, self::PRODUCT_APCU);
         if(!$product) {
             $product = $this->inner->findById($id);

@@ -2,11 +2,10 @@
 
 namespace App\Infrastructure\Cache;
 
-use Predis\Client;
 final class RedisCache implements CacheInterface
 {
     public function __construct(
-        private readonly Client $redis,
+        private readonly \Redis $redis,
     ) {}
 
     public function get(string $key): mixed
@@ -47,10 +46,12 @@ final class RedisCache implements CacheInterface
     {
         if (empty($items)) return;
 
-        $this->redis->pipeline(function ($pipe) use ($items, $ttl) {
-            foreach ($items as $key => $value) {
-                $pipe->setex($key, $ttl, serialize($value));
-            }
-        });
+        $pipe = $this->redis->multi(\Redis::PIPELINE);
+
+        foreach ($items as $key => $value) {
+            $pipe->setex($key, $ttl, serialize($value));
+        }
+
+        $pipe->exec();
     }
 }
