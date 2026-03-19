@@ -1,0 +1,31 @@
+{% if totalPages > 1 %}
+    <nav aria-label="Paginació de comandes" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if currentPage <= 1 %}disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ currentPage > 1 ? path('home', { offset: currentPage - 1, limit: currentLimit }) : '#' }}"
+                   tabindex="-1" aria-disabled="true">
+                    &laquo; Anterior
+                </a>
+            </li>
+
+            {% for i in 1..totalPages %}
+                <li class="page-item {% if currentPage == i %}active{% endif %}">
+                    <a class="page-link" href="{{ path('home', { offset: i, limit: currentLimit }) }}">
+                        {{ i }}
+                    </a>
+                </li>
+            {% endfor %}
+
+            <li class="page-item {% if currentPage >= totalPages %}disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ currentPage < totalPages ? path('home', { offset: currentPage + 1, limit: currentLimit }) : '#' }}">
+                    Següent &raquo;
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="text-center text-muted small mt-2">
+        Mostrant pàgina {{ currentPage }} de {{ totalPages }} (Total: {{ total }} comandes)
+    </div>
+{% endif %}

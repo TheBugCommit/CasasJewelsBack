@@ -28,6 +28,7 @@ db-init:
 	$(DOCKER_APP) php bin/console doctrine:fixtures:load
 
 cache-clear:
+	$(DOCKER_APP) php bin/console cache:clear
 	@echo "Netejant la memòria cau de Symfony i Redis..."
 	$(DOCKER_APP) php bin/console cache:pool:clear cache.global_clearer
 	@echo "Reiniciant les instàncies per buidar les memòries RAM d'APCu..."

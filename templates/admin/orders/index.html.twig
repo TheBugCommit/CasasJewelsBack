@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestió de Comandes{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Llistat de Comandes</h2>
+        </div>
+
+        {# Flash Messages #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {% include 'admin/orders/components/_filters.html.twig' %}
+
+        <div class="d-flex justify-content-end align-items-center mb-2">
+            <label for="limitSelect" class="small fw-bold text-muted me-2">Mostra:</label>
+            <select id="limitSelect" class="form-select form-select-sm w-auto cursor-pointer">
+                {% for limitOption in [10, 20, 50, 100, 500, 1000] %}
+                    <option value="{{ path('home', { limit: limitOption, offset: 1 }) }}"
+                            {% if currentLimit == limitOption %}selected{% endif %}>
+                        {{ limitOption }} comandes
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                {% include 'admin/orders/components/_table.html.twig' %}
+                {% include 'admin/orders/components/_pagination.html.twig' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/admin-orders.js') }}"></script>
+{% endblock %}

@@ -78,7 +78,7 @@ security:
             form_login:
                 login_path:    admin_login
                 check_path:    admin_login
-                default_target_path: /
+                default_target_path: home
                 enable_csrf:   true
 
             logout:

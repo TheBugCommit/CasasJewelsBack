@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Controller\Admin;
+namespace App\Infrastructure\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,8 +13,12 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AdminSecurityController extends AbstractController
 {
     #[Route('/admin/login', name: 'admin_login', methods: ['GET', 'POST'])]
-    public function login(AuthenticationUtils $authUtils): Response
-    {
+    public function login(AuthenticationUtils $authUtils): Response{
+
+        if($this->getUser()){
+            return $this->redirectToRoute('home');
+        }
+
         return $this->render('admin/login.html.twig', [
             'last_username' => $authUtils->getLastUsername(),
             'error' => $authUtils->getLastAuthenticationError(),

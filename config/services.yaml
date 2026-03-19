@@ -34,6 +34,11 @@ services:
     App\Infrastructure\Api\Security\ApiKeyAuthenticator:
         arguments: [ '%env(API_KEY)%' ]
 
+    #AdminSession
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
+
     #Repositories
     App\Infrastructure\Persistence\DoctrineProductRepository: ~
     App\Infrastructure\Persistence\CachedProductRepository:
