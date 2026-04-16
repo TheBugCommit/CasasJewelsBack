@@ -17,24 +17,45 @@
                 <td class="fw-bold col-name">{{ order.clientName }}</td>
                 <td class="col-status" data-status="{{ order.status|lower }}">
                     <span class="badge rounded-pill
-                        {% if order.status == 'processing' %}bg-warning text-dark
-                        {% elseif order.status == 'delivering' %}bg-primary
-                        {% elseif order.status == 'delivered' %}bg-success
+                        {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Processing.value %}bg-info text-dark
+                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Delivering.value %}bg-primary
+                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Delivered.value %}bg-success
+                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value %}bg-danger
+                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').PendingPayment.value %}bg-secondary
+                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Paid.value %}bg-warning
                         {% else %}bg-secondary{% endif %}">
                         {{ order.status|upper }}
                     </span>
                 </td>
                 <td class="text-end pe-3">
-                    {% for next_status in transitions[order.status] %}
-                        <form action="{{ path('admin_order_update_status', { id: order.id, status: next_status }) }}" method="POST" class="d-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('update_status_' ~ order.id) }}">
-                            <button type="submit" class="btn btn-sm {{ buttonColors[next_status] }}">
-                                Marcar "{{ statusLabels[next_status] }}"
-                            </button>
-                        </form>
+                    <a href="{{ path('admin_order_detail', { id: order.id }) }}" class="btn btn-sm btn-outline-primary me-1">
+                        <i class="bi bi-eye"></i> Veure Detall
+                    </a>
+                    {% for next_status in transitions[order.status]|default([]) %}
+                        {% if not (order.status == enum('App\\Domain\\ValueObject\\OrderStatus').RefundPending.value and next_status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value) %}
+                            <form
+                                action="{{ path('admin_order_update_status', { id: order.id, status: next_status }) }}"
+                                method="POST" class="d-inline">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('update_status_' ~ order.id) }}">
+
+                                <button type="submit" class="btn btn-sm {{ buttonColors[next_status] }}">
+                                    {{ actionLabels[next_status] }}
+                                </button>
+                            </form>
+
+                        {% endif %}
+
                     {% endfor %}
-                    {% if transitions[order.status] is empty %}
-                        <span class="text-muted small"><em>Completada</em></span>
+
+                    {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').RefundPending.value %}
+                        <span class="text-muted small"><em>
+                                Esperant confirmació de Stripe<div class="spinner-border spinner-border-sm text-secondary ms-1" role="status"></div>
+                        </em></span>
+                    {% elseif transitions[order.status]|default([]) is empty %}
+                        <span class="text-muted small"><em>
+                        {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value %}Cancel·lada{% else %}Completada{% endif %}
+                    </em></span>
                     {% endif %}
                 </td>
             </tr>

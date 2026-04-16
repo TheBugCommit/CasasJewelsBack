@@ -88,4 +88,41 @@ final class SymfonyEmailService implements EmailServiceInterface
 
         $this->mailer->send($email);
     }
+
+    /** @throws TransportExceptionInterface */
+    public function sendOrderPaid(Order $order): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address($this->senderEmail, $this->senderName))
+            ->to($order->getClientEmail())
+            ->subject('Pagament confirmat - La teva comanda està en procés')
+            ->htmlTemplate('emails/order_paid.html.twig')
+            ->context([
+                'clientName' => $order->getClientName(),
+                'orderId'    => $order->getId(),
+                'lines'      => $order->getLines(),
+                'total'      => $order->getTotalAmount(),
+                'createdAt'  => $order->getCreatedAt()->format('d/m/Y H:i'),
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    public function sendOrderCancelled(Order $order): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address($this->senderEmail, $this->senderName))
+            ->to($order->getClientEmail())
+            ->subject('Comanda cancel·lada i reemborsament processat')
+            ->htmlTemplate('emails/order_cancelled.html.twig')
+            ->context([
+                'clientName' => $order->getClientName(),
+                'orderId'    => $order->getId(),
+                'lines'      => $order->getLines(),
+                'total'      => $order->getTotalAmount(),
+                'createdAt'  => $order->getCreatedAt()->format('d/m/Y H:i'),
+            ]);
+
+        $this->mailer->send($email);
+    }
 }

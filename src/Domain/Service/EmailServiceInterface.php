@@ -10,6 +10,7 @@ interface EmailServiceInterface
 {
     public function sendOrderCreated(Order $order): void;
     public function sendOrderDelivering(Order $order): void;
-
     public function sendOrderDelivered(Order $order): void;
+    public function sendOrderPaid(Order $order): void;
+    public function sendOrderCancelled(Order $order): void;
 }

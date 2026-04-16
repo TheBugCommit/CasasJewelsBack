@@ -46,6 +46,26 @@ final class EmailQueueService
         ));
     }
 
+    public function queueOrderPaid(string $orderId): void
+    {
+        $this->emailJobRepository->enqueue(new EmailJob(
+            id:         $this->uuidGenerator->generate(),
+            type:       EmailJobType::OrderPaid,
+            orderId:    $orderId,
+            retryCount: 0,
+        ));
+    }
+
+    public function queueOrderCancelled(string $orderId): void
+    {
+        $this->emailJobRepository->enqueue(new EmailJob(
+            id:         $this->uuidGenerator->generate(),
+            type:       EmailJobType::OrderCancelled,
+            orderId:    $orderId,
+            retryCount: 0,
+        ));
+    }
+
     public function requeue(EmailJob $job): void
     {
         $this->emailJobRepository->enqueue($job->withIncrementedRetry());

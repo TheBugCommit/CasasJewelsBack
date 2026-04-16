@@ -44,7 +44,7 @@ class Order
             id: $id,
             clientName: $clientName,
             clientEmail: $clientEmail,
-            status: OrderStatus::Processing,
+            status: OrderStatus::PendingPayment,
             createdAt: new DateTimeImmutable(),
         );
     }
@@ -71,7 +71,9 @@ class Order
     /** @return OrderLine[] */
     public function getLines(): array
     {
-        return is_array($this->lines) ? $this->lines : iterator_to_array($this->lines);
+        return $this->lines instanceof \Traversable
+            ? iterator_to_array($this->lines)
+            : $this->lines;
     }
 
     public function getClientName(): string

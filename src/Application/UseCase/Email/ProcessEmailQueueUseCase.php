@@ -59,6 +59,8 @@ final class ProcessEmailQueueUseCase
                     EmailJobType::OrderCreated    => $this->emailService->sendOrderCreated($order),
                     EmailJobType::OrderDelivering => $this->emailService->sendOrderDelivering($order),
                     EmailJobType::OrderDelivered  => $this->emailService->sendOrderDelivered($order),
+                    EmailJobType::OrderPaid       => $this->emailService->sendOrderPaid($order),
+                    EmailJobType::OrderCancelled  => $this->emailService->sendOrderCancelled($order),
                 };
                 $processed++;
             } catch (\Throwable $e) {

@@ -56,6 +56,10 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build|css|images|js)/
             security: false
 
+        payment_webhook:
+            pattern: ^/payment/webhook
+            security: false
+
         # API firewall
         api:
             pattern: ^/api

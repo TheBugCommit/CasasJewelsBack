@@ -7,6 +7,7 @@ use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Api\Mapper\OrderMapper;
+use App\Infrastructure\Persistence\DoctrineUnitOfWork;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusResponseDTO;
 
@@ -15,7 +16,7 @@ final class UpdateOrderStatusUseCase
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderMapper              $orderMapper,
-        private readonly EmailQueueService        $emailQueueService,
+        private readonly EmailQueueService        $emailQueueService, private readonly DoctrineUnitOfWork $doctrineUnitOfWork,
     )
     {
     }
@@ -30,6 +31,7 @@ final class UpdateOrderStatusUseCase
         $newStatus = OrderStatus::from($request->status);
         $order->transitionTo($newStatus);
         $this->orderRepository->save($order);
+        $this->doctrineUnitOfWork->commit();
 
         if ($newStatus === OrderStatus::Delivering) {
             $this->emailQueueService->queueOrderDelivering($order->getId());

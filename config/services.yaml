@@ -52,17 +52,19 @@ services:
             $apcu: '@App\Infrastructure\Cache\APCuCache'
             $redis: '@App\Infrastructure\Cache\RedisCache'
 
-    #PayPal
-    App\Infrastructure\Service\PaypalPaymentService:
+    # Stripe
+    App\Infrastructure\Service\StripePaymentService:
         arguments:
-            $clientId: '%env(PAYPAL_CLIENT_ID)%'
-            $clientSecret: '%env(PAYPAL_CLIENT_SECRET)%'
-            $baseUrl: '%env(PAYPAL_BASE_URL)%'
-            $returnUrl: '%env(PAYPAL_RETURN_URL)%'
-            $cancelUrl: '%env(PAYPAL_CANCEL_URL)%'
+            $secretKey:  '%env(STRIPE_SECRET_KEY)%'
+            $successUrl: '%env(STRIPE_SUCCESS_URL)%'
+            $cancelUrl:  '%env(STRIPE_CANCEL_URL)%'
 
     App\Domain\Service\PaymentServiceInterface:
-        alias: App\Infrastructure\Service\PaypalPaymentService
+        alias: App\Infrastructure\Service\StripePaymentService
+
+    App\Infrastructure\Controller\PaymentWebhookController:
+        arguments:
+            $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
     # Email
     App\Infrastructure\Service\SymfonyEmailService:
