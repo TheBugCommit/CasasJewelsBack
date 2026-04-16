@@ -9,11 +9,12 @@ use App\Infrastructure\Cache\LayeredCache;
 final class CachedProductRepository implements ProductRepositoryInterface
 {
     private const IDS_APCU  = 60;
-    private const IDS_REDIS = 300;
-    private const PRODUCT_APCU  = 300;
-    private const PRODUCT_REDIS = 3600;
-    private const COUNT_APCU  = 120;
-    private const COUNT_REDIS = 600;
+    private const int IDS_REDIS = 300;
+    private const int PRODUCT_APCU  = 300;
+    private const int PRODUCT_REDIS = 3600;
+    private const int COUNT_APCU  = 120;
+    private const int COUNT_REDIS = 600;
+    private const int LIST_VERSION = 86400;
 
     public function __construct(
         private readonly ProductRepositoryInterface $inner,
@@ -22,7 +23,8 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
     public function findIdsPaginated(int $limit, int $offset): array
     {
-        $key = "products_ids_{$offset}_{$limit}";
+        $v = $this->getListVersion();
+        $key = "products_ids_v{$v}_{$offset}_{$limit}";
         $pageIds = $this->cache->get($key, self::IDS_APCU);
         if(!$pageIds) {
             $pageIds = $this->inner->findIdsPaginated($limit, $offset);
@@ -71,7 +73,8 @@ final class CachedProductRepository implements ProductRepositoryInterface
 
     public function countAll(): int
     {
-        $key = "products_count";
+        $v = $this->getListVersion();
+        $key = "products_count_v{$v}";
         $productCount = $this->cache->get($key, self::COUNT_APCU);
         if(!$productCount) {
             $productCount = $this->inner->countAll();
@@ -92,5 +95,31 @@ final class CachedProductRepository implements ProductRepositoryInterface
         }
 
         return $product;
+    }
+
+    public function save(Product $product): void
+    {
+        $this->inner->save($product);
+        $this->bumpListVersion();
+    }
+
+    public function delete(Product $product): void
+    {
+        $this->inner->delete($product);
+        $this->cache->invalidate("product_stable_{$product->getId()}");
+        $this->cache->invalidate('products_count');
+        $this->bumpListVersion();
+    }
+
+    private function getListVersion(): int
+    {
+        $version = $this->cache->getGlobal('products_list_version');
+        return (int) ($version ?: 0);
+    }
+
+    private function bumpListVersion(): void
+    {
+        $newVersion = $this->getListVersion() + 1;
+        $this->cache->setGlobal('products_list_version', $newVersion, self::LIST_VERSION);
     }
 }

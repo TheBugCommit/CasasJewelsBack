@@ -5,6 +5,7 @@ namespace App\Application\UseCase\Order;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
+use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Api\Mapper\OrderMapper;
 use App\Infrastructure\Persistence\DoctrineUnitOfWork;
@@ -16,7 +17,8 @@ final class UpdateOrderStatusUseCase
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderMapper              $orderMapper,
-        private readonly EmailQueueService        $emailQueueService, private readonly DoctrineUnitOfWork $doctrineUnitOfWork,
+        private readonly EmailQueueService        $emailQueueService,
+        private readonly UnitOfWorkInterface      $uow,
     )
     {
     }
@@ -31,7 +33,7 @@ final class UpdateOrderStatusUseCase
         $newStatus = OrderStatus::from($request->status);
         $order->transitionTo($newStatus);
         $this->orderRepository->save($order);
-        $this->doctrineUnitOfWork->commit();
+        $this->uow->commit();
 
         if ($newStatus === OrderStatus::Delivering) {
             $this->emailQueueService->queueOrderDelivering($order->getId());

@@ -79,3 +79,12 @@ services:
     App\Infrastructure\Persistence\RedisEmailJobRepository: ~
     App\Domain\Repository\EmailJobRepositoryInterface:
         alias: App\Infrastructure\Persistence\RedisEmailJobRepository
+
+    # Unit of Work
+    App\Domain\Repository\UnitOfWorkInterface:
+        alias: App\Infrastructure\Persistence\DoctrineUnitOfWork
+
+    # Product Image Upload
+    App\Infrastructure\Service\ProductImageUploadService:
+        arguments:
+            $uploadDir: '%kernel.project_dir%/public/uploads/products'

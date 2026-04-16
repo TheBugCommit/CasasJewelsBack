@@ -53,7 +53,7 @@ security:
 
     firewalls:
         dev:
-            pattern: ^/(_profiler|_wdt|assets|build|css|images|js)/
+            pattern: ^/(_profiler|_wdt|assets|build|css|images|js|uploads)/
             security: false
 
         payment_webhook:

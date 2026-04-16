@@ -58,4 +58,18 @@ final class DoctrineProductRepository implements ProductRepositoryInterface
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function save(Product $product): void
+    {
+        $this->em->persist($product);
+    }
+
+    public function delete(Product $product): void
+    {
+        $managedProduct = $this->em->contains($product)
+            ? $product
+            : $this->em->getReference(Product::class, $product->getId());
+
+        $this->em->remove($managedProduct);
+    }
 }

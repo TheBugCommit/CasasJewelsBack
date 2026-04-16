@@ -27,6 +27,17 @@ final class LayeredCache
         return null;
     }
 
+    public function getGlobal(string $key): mixed
+    {
+        return $this->redis->get($key);
+    }
+
+    public function setGlobal(string $key, mixed $value, int $ttl): void
+    {
+        $this->redis->set($key, $value, $ttl);
+        $this->apcu->delete($key);
+    }
+
     public function set(string $key, mixed $value, int $apCuTtl, int $redisTtl): void
     {
         $this->apcu->set($key, $value, $apCuTtl);

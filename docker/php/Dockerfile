@@ -34,3 +34,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
+
+RUN mkdir -p /var/www/html/public/uploads/products \
+    && chown -R www-data:www-data /var/www/html/public/uploads \
+    && chmod -R 775 /var/www/html/public/uploads

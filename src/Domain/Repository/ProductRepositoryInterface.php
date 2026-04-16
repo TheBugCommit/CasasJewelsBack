@@ -14,4 +14,8 @@ interface ProductRepositoryInterface
     public function findById(string $id): Product|null;
 
     public function countAll(): int;
+
+    public function save(Product $product): void;
+
+    public function delete(Product $product): void;
 }

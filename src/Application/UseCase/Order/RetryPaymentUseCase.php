@@ -6,6 +6,7 @@ namespace App\Application\UseCase\Order;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Domain\Repository\OrderRepositoryInterface;
+use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\Service\PaymentServiceInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Api\Mapper\OrderMapper;
@@ -18,7 +19,7 @@ final class RetryPaymentUseCase
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly PaymentServiceInterface  $paymentService,
         private readonly OrderMapper              $orderMapper,
-        private readonly DoctrineUnitOfWork $doctrineUnitOfWork,
+        private readonly UnitOfWorkInterface      $uow,
     ) {}
 
     public function execute(string $orderId): CreateOrderResponseDTO
@@ -36,7 +37,7 @@ final class RetryPaymentUseCase
 
         $order->assignPaymentDetails($paymentData['transactionId'], $paymentData['paymentUrl']);
         $this->orderRepository->save($order);
-        $this->doctrineUnitOfWork->commit();
+        $this->uow->commit();
 
         return $this->orderMapper->toCreateOrderResponseDTO($order);
     }

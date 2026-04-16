@@ -6,6 +6,7 @@ namespace App\Application\UseCase\Order;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
+use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Persistence\DoctrineUnitOfWork;
 
@@ -13,7 +14,8 @@ final class ConfirmOrderRefundedUseCase
 {
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly EmailQueueService        $emailQueueService, private readonly DoctrineUnitOfWork $doctrineUnitOfWork,
+        private readonly EmailQueueService        $emailQueueService,
+        private readonly UnitOfWorkInterface      $uow,
     ) {}
 
     public function execute(string $orderId): void
@@ -26,6 +28,6 @@ final class ConfirmOrderRefundedUseCase
         $order->transitionTo(OrderStatus::Cancelled);
         $this->orderRepository->save($order);
         $this->emailQueueService->queueOrderCancelled($order->getId());
-        $this->doctrineUnitOfWork->commit();
+        $this->uow->commit();
     }
 }

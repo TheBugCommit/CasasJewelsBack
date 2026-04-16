@@ -10,5 +10,7 @@
         <field name="name" type="string" length="255"/>
         <field name="description" type="text"/>
         <field name="price" type="float"/>
+        <field name="category" type="string" length="50" enum-type="App\Domain\ValueObject\ProductCategory"/>
+        <field name="imageUrl" type="string" length="500" nullable="true" column="image_url"/>
     </entity>
 </doctrine-mapping>

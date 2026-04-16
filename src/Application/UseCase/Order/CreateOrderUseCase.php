@@ -8,6 +8,7 @@ use App\Domain\Factory\OrderFactory;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Application\Service\EmailQueueService;
+use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\Service\PaymentServiceInterface;
 use App\Domain\Service\UuidGeneratorInterface;
 use App\Infrastructure\Api\Mapper\OrderMapper;
@@ -24,7 +25,7 @@ final class CreateOrderUseCase
         private readonly EmailQueueService          $emailQueueService,
         private readonly OrderFactory               $orderFactory,
         private readonly PaymentServiceInterface    $paymentService,
-        private readonly DoctrineUnitOfWork         $doctrineUnitOfWork,
+        private readonly UnitOfWorkInterface        $uow,
     ) {}
 
     public function execute(CreateOrderRequestDTO $request): CreateOrderResponseDTO
@@ -43,7 +44,7 @@ final class CreateOrderUseCase
         $order->assignPaymentDetails($paymentData['transactionId'], $paymentData['paymentUrl']);
 
         $this->orders->save($order);
-        $this->doctrineUnitOfWork->commit();
+        $this->uow->commit();
         $this->emailQueueService->queueOrderCreated($order->getId());
 
         return $this->orderMapper->toCreateOrderResponseDTO($order);

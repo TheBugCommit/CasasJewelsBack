@@ -2,24 +2,42 @@
 
 namespace App\Domain\Entity;
 
+use App\Domain\ValueObject\ProductCategory;
+
 class Product
 {
     private string $id;
     private string $name;
     private float $price;
     private string $description;
+    private ProductCategory $category;
+    private ?string $imageUrl;
 
-    public function __construct(string $id, string $name, float $price, string $description)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->price = $price;
+    public function __construct(
+        string $id,
+        string $name,
+        float $price,
+        string $description,
+        ProductCategory $category,
+        ?string $imageUrl = null,
+    ) {
+        $this->id          = $id;
+        $this->name        = $name;
+        $this->price       = $price;
         $this->description = $description;
+        $this->category    = $category;
+        $this->imageUrl    = $imageUrl;
     }
 
-    public static function create(string $id, string $name, float $price, string $description): self
-    {
-        return new self($id, $name, $price, $description);
+    public static function create(
+        string $id,
+        string $name,
+        float $price,
+        string $description,
+        ProductCategory $category,
+        ?string $imageUrl = null,
+    ): self {
+        return new self($id, $name, $price, $description, $category, $imageUrl);
     }
 
     public function getId(): string
@@ -35,7 +53,6 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -47,7 +64,6 @@ class Product
     public function setPrice(float $price): static
     {
         $this->price = $price;
-
         return $this;
     }
 
@@ -59,7 +75,28 @@ class Product
     public function setDescription(string $description): static
     {
         $this->description = $description;
+        return $this;
+    }
 
+    public function getCategory(): ProductCategory
+    {
+        return $this->category;
+    }
+
+    public function setCategory(ProductCategory $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    public function setImageUrl(?string $imageUrl): static
+    {
+        $this->imageUrl = $imageUrl;
         return $this;
     }
 }

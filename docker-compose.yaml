@@ -20,14 +20,9 @@ services:
         volumes:
             - ./:/var/www/html
             - ../CasasJewelsVendor:/var/www/CasasJewelsVendor
-        environment:
-            DATABASE_URL: "${DATABASE_URL}"
-            REDIS_DSN: "${REDIS_DSN}"
-            MAILER_DSN: "${MAILER_DSN}"
-            STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY}"
-            STRIPE_WEBHOOK_SECRET: "${STRIPE_WEBHOOK_SECRET}"
-            STRIPE_SUCCESS_URL: "${STRIPE_SUCCESS_URL}"
-            STRIPE_CANCEL_URL: "${STRIPE_CANCEL_URL}"
+            - shared_uploads:/var/www/html/public/uploads
+        env_file:
+            - .env.local
         depends_on:
             - postgres
             - redis
@@ -76,6 +71,7 @@ services:
 
 volumes:
     db_data:
+    shared_uploads:
 
 networks:
     backend_internal:

@@ -38,6 +38,8 @@ final class ProductMapper
             name:        $product->getName(),
             price:       $product->getPrice(),
             description: $product->getDescription(),
+            category:    $product->getCategory()->value,
+            imageUrl:    $product->getImageUrl(),
         );
     }
 }
