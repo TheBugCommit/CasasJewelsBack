@@ -7,6 +7,9 @@ services:
             - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
             - backend
+        networks:
+            - shared_api_network
+            - backend_internal
 
     backend:
         build:
@@ -25,6 +28,8 @@ services:
             - postgres
             - redis
             - mailhog
+        networks:
+            - backend_internal
 
     postgres:
         image: postgres:16-alpine
@@ -36,16 +41,23 @@ services:
             - "5432:5432"
         volumes:
             - db_data:/var/lib/postgresql/data
+        networks:
+            - backend_internal
 
     redis:
         image: redis:8-alpine
         ports:
             - "6379:6379"
+        networks:
+            - backend_internal
 
     mailhog:
         image: mailhog/mailhog
         ports:
             - "8025:8025"
+        networks:
+            - backend_internal
+
     pgadmin:
         image: dpage/pgadmin4:9.8
         environment:
@@ -55,6 +67,15 @@ services:
             PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
         ports:
             - "5050:80"
+        networks:
+            - backend_internal
 
 volumes:
     db_data:
+
+networks:
+    backend_internal:
+        driver: bridge
+    shared_api_network:
+        name: shared_api_network
+        driver: bridge

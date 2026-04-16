@@ -72,3 +72,8 @@ services:
 
     App\Domain\Service\EmailServiceInterface:
         alias: App\Infrastructure\Service\SymfonyEmailService
+
+    # Email Queue
+    App\Infrastructure\Persistence\RedisEmailJobRepository: ~
+    App\Domain\Repository\EmailJobRepositoryInterface:
+        alias: App\Infrastructure\Persistence\RedisEmailJobRepository

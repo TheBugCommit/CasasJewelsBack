@@ -4,9 +4,10 @@ namespace App\Application\UseCase\Order;
 
 use App\Application\Exception\ProductNotFoundException;
 use App\Domain\Entity\Order;
+use App\Domain\Factory\OrderFactory;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
-use App\Domain\Service\EmailServiceInterface;
+use App\Application\Service\EmailQueueService;
 use App\Domain\Service\UuidGeneratorInterface;
 use App\Infrastructure\Api\Mapper\OrderMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\CreateOrder\CreateOrderRequestDTO;
@@ -18,8 +19,8 @@ final class CreateOrderUseCase
         private readonly OrderMapper $orderMapper,
         private readonly OrderRepositoryInterface $orders,
         private readonly ProductRepositoryInterface $products,
-        private readonly UuidGeneratorInterface $uuidGenerator,
-        private readonly EmailServiceInterface $emailService,
+        private readonly EmailQueueService $emailQueueService,
+        private readonly OrderFactory $orderFactory
     ) {}
 
     public function execute(CreateOrderRequestDTO $request): CreateOrderResponseDTO
@@ -30,36 +31,17 @@ final class CreateOrderUseCase
         $transactionId = "123";
         $paymentUrl = "http://1234";
 
-        $orderId = $this->uuidGenerator->generate();
-        $order = Order::create(
-            id:            $orderId,
-            clientName:    $request->clientName,
-            clientEmail:   $request->clientEmail,
-            transactionId: $transactionId,
-            paymentUrl:    $paymentUrl,
-        );
+        $order = $this->orderFactory->createFromRequest($request, $products);
+        /*$paymentData = $this->paymentService->initiate(
+            $order->getId(),
+            $order->getClientEmail(),
+            $order->getTotalAmount()
+        );*/
 
-        $productsById = [];
-        foreach ($products as $product) {
-            $productsById[$product->getId()] = $product;
-        }
+        $order->assignPaymentDetails($transactionId, $paymentUrl);
 
-        foreach ($request->lines as $lineDTO) {
-            $product = $productsById[$lineDTO->productId] ?? null;
-            if (!$product) {
-                throw ProductNotFoundException::withId($lineDTO->productId);
-            }
-
-            $order->addLine(
-                lineId:    $this->uuidGenerator->generate(),
-                productId: $product->getId(),
-                quantity:  $lineDTO->quantity,
-                unitPrice: $product->getPrice()
-            );
-        }
-
-        $this->orders->save($order); #TODO: Queue Batch Insert
-        $this->emailService->sendOrderCreated($order);
+        $this->orders->save($order);
+        $this->emailQueueService->queueOrderCreated($order->getId());
 
         return $this->orderMapper->toCreateOrderResponseDTO($order);
     }

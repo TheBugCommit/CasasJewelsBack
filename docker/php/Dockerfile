@@ -18,12 +18,8 @@ RUN docker-php-ext-install -j$(nproc) intl
 RUN docker-php-ext-install -j$(nproc) zip
 RUN docker-php-ext-install -j$(nproc) pcntl
 
-# 3. Configurem i instal·lem GD
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install -j$(nproc) gd
-
-#RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-#RUN docker-php-ext-install pdo pdo_pgsql intl opcache zip gd pcntl
 
 RUN pecl install apcu redis \
     && docker-php-ext-enable apcu redis

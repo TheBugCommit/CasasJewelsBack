@@ -26,6 +26,21 @@ final class DoctrineOrderRepository implements OrderRepositoryInterface
         return $this->em->getRepository(Order::class)->find($id);
     }
 
+    public function findByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->em->createQueryBuilder()
+            ->select('o')
+            ->from(Order::class, 'o')
+            ->where('o.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findPaginated(int $limit, int $offset): PaginatedOrderList
     {
         $query = $this->em->createQueryBuilder()

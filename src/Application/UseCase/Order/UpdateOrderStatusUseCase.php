@@ -3,8 +3,8 @@
 namespace App\Application\UseCase\Order;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
-use App\Domain\Service\EmailServiceInterface;
 use App\Domain\ValueObject\OrderStatus;
 use App\Infrastructure\Api\Mapper\OrderMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusRequestDTO;
@@ -15,7 +15,7 @@ final class UpdateOrderStatusUseCase
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderMapper              $orderMapper,
-        private readonly EmailServiceInterface    $emailService,
+        private readonly EmailQueueService        $emailQueueService,
     )
     {
     }
@@ -32,10 +32,10 @@ final class UpdateOrderStatusUseCase
         $this->orderRepository->save($order);
 
         if ($newStatus === OrderStatus::Delivering) {
-            $this->emailService->sendOrderDelivering($order);
+            $this->emailQueueService->queueOrderDelivering($order->getId());
         }
         if ($newStatus === OrderStatus::Delivered) {
-            $this->emailService->sendOrderDelivered($order);
+            $this->emailQueueService->queueOrderDelivered($order->getId());
         }
 
         return $this->orderMapper->toUpdateOrderStatusResponseDTO($order);

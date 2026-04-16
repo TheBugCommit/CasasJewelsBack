@@ -24,8 +24,6 @@ class Order
         string            $clientEmail,
         OrderStatus       $status,
         DateTimeImmutable $createdAt,
-        string            $transactionId,
-        string            $paymentUrl,
     )
     {
         $this->id = $id;
@@ -33,8 +31,6 @@ class Order
         $this->clientEmail = $clientEmail;
         $this->status = $status;
         $this->createdAt = $createdAt;
-        $this->transactionId = $transactionId;
-        $this->paymentUrl = $paymentUrl;
         $this->lines = [];
     }
 
@@ -42,8 +38,6 @@ class Order
         string $id,
         string $clientName,
         string $clientEmail,
-        string $transactionId,
-        string $paymentUrl,
     ): self
     {
         return new self(
@@ -52,8 +46,6 @@ class Order
             clientEmail: $clientEmail,
             status: OrderStatus::Processing,
             createdAt: new DateTimeImmutable(),
-            transactionId: $transactionId,
-            paymentUrl: $paymentUrl,
         );
     }
 
@@ -102,12 +94,12 @@ class Order
         return $this->createdAt;
     }
 
-    public function getTransactionId(): string
+    public function getTransactionId(): string|null
     {
         return $this->transactionId;
     }
 
-    public function getPaymentUrl(): string
+    public function getPaymentUrl(): string|null
     {
         return $this->paymentUrl;
     }
@@ -116,5 +108,11 @@ class Order
     {
         $this->status->assertCanTransitionTo($newStatus);
         $this->status = $newStatus;
+    }
+
+    public function assignPaymentDetails(string $transactionId, string $paymentUrl): void
+    {
+        $this->transactionId = $transactionId;
+        $this->paymentUrl = $paymentUrl;
     }
 }
