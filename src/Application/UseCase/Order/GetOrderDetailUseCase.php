@@ -2,14 +2,15 @@
 
 namespace App\Application\UseCase\Order;
 
+use App\Application\Service\OrderProductService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
 
 final class GetOrderDetailUseCase
 {
     public function __construct(
-        private readonly OrderRepositoryInterface $orderRepository,
-        private readonly ProductRepositoryInterface $productRepository,
+        private readonly OrderRepositoryInterface   $orderRepository,
+        private readonly OrderProductService $orderProductService,
     ) {}
 
     /**
@@ -19,21 +20,11 @@ final class GetOrderDetailUseCase
     public function execute(string $orderId): ?array
     {
         $order = $this->orderRepository->findById($orderId);
-
         if (!$order) {
             return null;
         }
 
-        $productIds = [];
-        foreach ($order->getLines() as $line) {
-            $productIds[] = $line->getProductId();
-        }
-
-        $productsFromDb = $this->productRepository->findByIds(array_unique($productIds));
-        $productsMap = [];
-        foreach ($productsFromDb as $product) {
-            $productsMap[$product->getId()] = $product;
-        }
+        $productsMap = $this->orderProductService->getProductsForOrder($order);
 
         return [
             'order'    => $order,

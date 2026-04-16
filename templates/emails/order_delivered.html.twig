@@ -1,69 +1,12 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-        .header { background: #1a6b3a; color: #fff; padding: 32px 40px; }
-        .header h1 { margin: 0; font-size: 22px; }
-        .body { padding: 32px 40px; }
-        .body p { line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #f0f0f0; text-align: left; padding: 10px 12px; font-size: 13px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .total-row td { font-weight: bold; border-top: 2px solid #333; }
-        .badge { display: inline-block; background: #1a6b3a; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
-        .footer { padding: 20px 40px; background: #f0f0f0; font-size: 12px; color: #888; text-align: center; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>La teva comanda ha estat lliurada 🎉</h1>
-    </div>
-    <div class="body">
-        <p>Hola, <strong>{{ clientName }}</strong>!</p>
-        <p>
-            T'informem que la teva comanda <strong>#{{ orderId }}</strong>
-            ha estat <span class="badge">lliurada</span> correctament.
-        </p>
+{% extends 'emails/base_email.html.twig' %}
 
-        <table>
-            <thead>
-            <tr>
-                <th>Producte ID</th>
-                <th>Quantitat</th>
-                <th>Preu unitari</th>
-                <th>Subtotal</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for line in lines %}
-                <tr>
-                    <td>{{ line.productId }}</td>
-                    <td>{{ line.quantity }}</td>
-                    <td>{{ line.unitPrice | number_format(2, '.', ',') }} €</td>
-                    <td>{{ line.total | number_format(2, '.', ',') }} €</td>
-                </tr>
-            {% endfor %}
-            <tr class="total-row">
-                <td colspan="3">Total</td>
-                <td>{{ total | number_format(2, '.', ',') }} €</td>
-            </tr>
-            </tbody>
-        </table>
+{% block header_color %}#1a6b3a{% endblock %}
+{% block header_title %}La teva comanda ha estat lliurada 🎉{% endblock %}
 
-        <p>
-            <strong>Número de comanda:</strong> {{ orderId }}<br>
-            <strong>Data de la comanda:</strong> {{ createdAt }}
-        </p>
+{% block content %}
+    <p>T'informem que la teva comanda ha estat <span class="badge" style="background: #1a6b3a; color: #fff;">lliurada</span> correctament.</p>
 
-        <p>Gràcies per confiar en Casas Jewels. Esperem que gaudeixis de la teva compra!</p>
-    </div>
-    <div class="footer">
-        © {{ "now"|date("Y") }} Casas Jewels. Tots els drets reservats.
-    </div>
-</div>
-</body>
-</html>
+    {% include 'emails/components/_order_table.html.twig' %}
+
+    <p>Esperem que gaudeixis de la teva nova joia! Gràcies per confiar en nosaltres.</p>
+{% endblock %}

@@ -1,0 +1,33 @@
+<table>
+    <thead>
+    <tr>
+        <th>Producte</th>
+        <th style="text-align: center;">Quantitat</th>
+        <th style="text-align: right;">Preu</th>
+        <th style="text-align: right;">Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for line in order.lines %}
+        <tr>
+            <td>
+                {% set product = products[line.productId]|default(null) %}
+                <strong>{{ product ? product.name : 'Producte desconegut' }}</strong><br>
+                <small style="color: #888; font-size: 11px;">Ref: {{ line.productId|slice(0,8) }}</small>
+            </td>
+            <td style="text-align: center;">{{ line.quantity }}</td>
+            <td style="text-align: right;">{{ line.unitPrice | number_format(2, ',', '.') }} €</td>
+            <td style="text-align: right;">{{ line.total | number_format(2, ',', '.') }} €</td>
+        </tr>
+    {% endfor %}
+    <tr class="total-row">
+        <td colspan="3" style="text-align: right;">Total Comanda</td>
+        <td style="text-align: right; color: #1a6b3a;">{{ order.totalAmount | number_format(2, ',', '.') }} €</td>
+    </tr>
+    </tbody>
+</table>
+
+<p style="font-size: 13px; color: #555;">
+    <strong>Número de comanda:</strong> #{{ order.id|slice(0,8) }}<br>
+    <strong>Data:</strong> {{ order.createdAt|date('d/m/Y H:i') }}
+</p>

@@ -1,69 +1,14 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-        .header { background: #1a5c2a; color: #fff; padding: 32px 40px; }
-        .header h1 { margin: 0; font-size: 22px; }
-        .body { padding: 32px 40px; }
-        .body p { line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #f0f0f0; text-align: left; padding: 10px 12px; font-size: 13px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .total-row td { font-weight: bold; border-top: 2px solid #333; }
-        .badge { display: inline-block; background: #d4edda; color: #155724; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 16px; }
-        .footer { padding: 20px 40px; background: #f0f0f0; font-size: 12px; color: #888; text-align: center; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Casas Jewels — Pagament confirmat</h1>
-    </div>
-    <div class="body">
-        <p>Hola, <strong>{{ clientName }}</strong>!</p>
-        <span class="badge">Pagament rebut correctament</span>
-        <p>El teu pagament s'ha processat amb èxit. Estem preparant la teva comanda i aviat la rebràs.</p>
+{% extends 'emails/base_email.html.twig' %}
 
-        <table>
-            <thead>
-            <tr>
-                <th>Producte ID</th>
-                <th>Quantitat</th>
-                <th>Preu unitari</th>
-                <th>Subtotal</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for line in lines %}
-                <tr>
-                    <td>{{ line.productId }}</td>
-                    <td>{{ line.quantity }}</td>
-                    <td>{{ line.unitPrice | number_format(2, '.', ',') }} €</td>
-                    <td>{{ line.total | number_format(2, '.', ',') }} €</td>
-                </tr>
-            {% endfor %}
-            <tr class="total-row">
-                <td colspan="3">Total pagat</td>
-                <td>{{ total | number_format(2, '.', ',') }} €</td>
-            </tr>
-            </tbody>
-        </table>
+{% block header_color %}#1a5c2a{% endblock %}
+{% block header_title %}Casas Jewels — Pagament confirmat{% endblock %}
 
-        <p>
-            <strong>Número de comanda:</strong> {{ orderId }}<br>
-            <strong>Data:</strong> {{ createdAt }}
-        </p>
+{% block content %}
+    <span class="badge" style="background: #d4edda; color: #155724;">Pagament rebut correctament</span>
 
-        <p style="margin-top: 32px; font-size: 13px; color: #888;">
-            Gràcies per confiar en Casas Jewels. Si tens qualsevol dubte, contacta'ns responent a aquest correu.
-        </p>
-    </div>
-    <div class="footer">
-        © {{ "now"|date("Y") }} Casas Jewels. Tots els drets reservats.
-    </div>
-</div>
-</body>
-</html>
+    <p>El teu pagament s'ha processat amb èxit. En breu començarem a preparar la teva comanda.</p>
+
+    {% include 'emails/components/_order_table.html.twig' %}
+
+    <p style="margin-top: 20px;">Gràcies per confiar en Casas Jewels!</p>
+{% endblock %}

@@ -1,73 +1,13 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-        /* Capçalera en un to vermell/granat elegant */
-        .header { background: #8c1d1d; color: #fff; padding: 32px 40px; }
-        .header h1 { margin: 0; font-size: 22px; }
-        .body { padding: 32px 40px; }
-        .body p { line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #f0f0f0; text-align: left; padding: 10px 12px; font-size: 13px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .total-row td { font-weight: bold; border-top: 2px solid #333; }
-        /* Badge en tons vermells d'alerta suau */
-        .badge { display: inline-block; background: #f8d7da; color: #721c24; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 16px; }
-        .footer { padding: 20px 40px; background: #f0f0f0; font-size: 12px; color: #888; text-align: center; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Casas Jewels — Comanda cancel·lada</h1>
-    </div>
-    <div class="body">
-        <p>Hola, <strong>{{ clientName }}</strong>,</p>
-        <span class="badge">Cancel·lada i Reemborsada</span>
-        <p>Lamentem informar-te que la teva comanda ha estat cancel·lada. <strong>Ja hem processat el reemborsament de {{ total | number_format(2, '.', ',') }} €</strong> cap al teu mètode de pagament original. Els diners poden trigar uns dies a reflectir-se al teu compte depenent del teu banc.</p>
+{% extends 'emails/base_email.html.twig' %}
 
-        <p>Aquest és el detall de la comanda cancel·lada:</p>
+{% block header_color %}#8c1d1d{% endblock %}
+{% block header_title %}Casas Jewels — Comanda cancel·lada{% endblock %}
 
-        <table>
-            <thead>
-            <tr>
-                <th>Producte ID</th>
-                <th>Quantitat</th>
-                <th>Preu unitari</th>
-                <th>Subtotal</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for line in lines %}
-                <tr>
-                    <td>{{ line.productId }}</td>
-                    <td>{{ line.quantity }}</td>
-                    <td>{{ line.unitPrice | number_format(2, '.', ',') }} €</td>
-                    <td>{{ line.total | number_format(2, '.', ',') }} €</td>
-                </tr>
-            {% endfor %}
-            <tr class="total-row">
-                <td colspan="3">Total reemborsat</td>
-                <td>{{ total | number_format(2, '.', ',') }} €</td>
-            </tr>
-            </tbody>
-        </table>
+{% block content %}
+    <span class="badge" style="background: #f8d7da; color: #721c24;">Cancel·lada i Reemborsada</span>
+    <p>Lamentem informar-te que la teva comanda ha estat cancel·lada. <strong>Ja hem processat el reemborsament íntegre</strong> cap al teu mètode de pagament original. Els diners poden trigar uns dies a reflectir-se al teu compte depenent del teu banc.</p>
 
-        <p>
-            <strong>Número de comanda:</strong> {{ orderId }}<br>
-            <strong>Data de la compra:</strong> {{ createdAt }}
-        </p>
+    <p>Aquest és el detall de la comanda cancel·lada:</p>
 
-        <p style="margin-top: 32px; font-size: 13px; color: #888;">
-            Si creus que això és un error o tens qualsevol dubte, si us plau contacta'ns responent a aquest correu. Estarem encantats d'ajudar-te.
-        </p>
-    </div>
-    <div class="footer">
-        © {{ "now"|date("Y") }} Casas Jewels. Tots els drets reservats.
-    </div>
-</div>
-</body>
-</html>
+    {% include 'emails/components/_order_table.html.twig' %}
+{% endblock %}
