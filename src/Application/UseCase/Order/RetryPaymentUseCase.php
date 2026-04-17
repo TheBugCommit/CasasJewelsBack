@@ -9,7 +9,8 @@ use App\Application\Mappers\OrderMapper;
 use App\Application\Service\OrderPaymentService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
-use Sce\CasasJewelsVendor\DTO\Requests\CreateOrder\CreateOrderResponseDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\RetryPayment\RetryPaymentRequestDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\RetryPayment\RetryPaymentResponseDTO;
 
 final class RetryPaymentUseCase
 {
@@ -20,11 +21,11 @@ final class RetryPaymentUseCase
         private readonly OrderPaymentService      $orderPaymentService,
     ) {}
 
-    public function execute(string $orderId): CreateOrderResponseDTO
+    public function execute(RetryPaymentRequestDTO $request): RetryPaymentResponseDTO
     {
-        $order = $this->orderRepository->findById($orderId);
+        $order = $this->orderRepository->findById($request->orderId);
         if (!$order) {
-            throw OrderNotFoundException::withId($orderId);
+            throw OrderNotFoundException::withId($request->orderId);
         }
 
         $this->orderPaymentService->generatePaymentForOrder($order);
@@ -32,6 +33,6 @@ final class RetryPaymentUseCase
         $this->orderRepository->save($order);
         $this->uow->commit();
 
-        return $this->orderMapper->toCreateOrderResponseDTO($order);
+        return $this->orderMapper->toRetryPaymentResponseDTO($order);
     }
 }

@@ -45,8 +45,8 @@
                             </div>
                             <div class="col-sm-6 text-sm-end">
                                 <p class="text-muted mb-1">Estat actual</p>
-                                <span class="badge border {{ badge_colors[order.status.value]|default('bg-light text-dark') }}">
-                                    {{ statusLabels[order.status.value]|default(order.status.value|upper) }}
+                                <span class="badge border {{ badge_colors[order.status]|default('bg-light text-dark') }}">
+                                    {{ statusLabels[order.status]|default(order.status|upper) }}
                                 </span>
                             </div>
                         </div>
@@ -62,17 +62,16 @@
                             </thead>
                             <tbody>
                             {% for line in order.lines %}
-                                <tr>
+                                <tr {% if line.productDeleted %}class="table-warning"{% endif %}>
                                     <td>
-                                        {% set product = products[line.productId]|default(null) %}
-
-                                        {% if product %}
-                                            <strong>{{ product.name }}</strong><br>
-                                            <small class="text-muted text-monospace">{{ line.productId }}</small>
+                                        {% if line.productDeleted %}
+                                            <span class="text-danger fw-semibold">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Producte eliminat
+                                            </span><br>
                                         {% else %}
-                                            <span class="text-danger">Producte no trobat</span><br>
-                                            <small class="text-muted text-monospace">{{ line.productId }}</small>
+                                            <strong>{{ line.productName }}</strong><br>
                                         {% endif %}
+                                        <small class="text-muted text-monospace">{{ line.productId }}</small>
                                     </td>
                                     <td class="text-center">{{ line.quantity }}</td>
                                     <td class="text-end">{{ line.unitPrice|number_format(2, ',', '.') }} €</td>

@@ -10,7 +10,8 @@ use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\Service\PaymentServiceInterface;
 use App\Domain\ValueObject\OrderStatus;
-use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusResponseDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\RefundOrder\RefundOrderRequestDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\RefundOrder\RefundOrderResponseDTO;
 
 final class RefundOrderUseCase
 {
@@ -21,11 +22,11 @@ final class RefundOrderUseCase
         private readonly UnitOfWorkInterface      $uow,
     ) {}
 
-    public function execute(string $orderId): UpdateOrderStatusResponseDTO
+    public function execute(RefundOrderRequestDTO $request): RefundOrderResponseDTO
     {
-        $order = $this->orderRepository->findById($orderId);
+        $order = $this->orderRepository->findById($request->orderId);
         if (!$order) {
-            throw OrderNotFoundException::withId($orderId);
+            throw OrderNotFoundException::withId($request->orderId);
         }
 
         $order->transitionTo(OrderStatus::RefundPending);
@@ -37,6 +38,6 @@ final class RefundOrderUseCase
         $this->orderRepository->save($order);
         $this->uow->commit();
 
-        return $this->orderMapper->toUpdateOrderStatusResponseDTO($order);
+        return $this->orderMapper->toRefundOrderResponseDTO($order);
     }
 }
