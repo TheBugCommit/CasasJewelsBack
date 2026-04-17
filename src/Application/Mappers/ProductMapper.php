@@ -9,6 +9,7 @@ use Sce\CasasJewelsVendor\DTO\Requests\DeleteProduct\DeleteProductResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductDetailResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListResponseDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductsByIdsResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateProduct\UpdateProductResponseDTO;
 
 final class ProductMapper
@@ -46,6 +47,14 @@ final class ProductMapper
     {
         return new UpdateProductResponseDTO(
             data: $this->toProductDTO($product),
+        );
+    }
+
+    /** @param Product[] $products */
+    public function toProductsByIdsResponseDTO(array $products): GetProductsByIdsResponseDTO
+    {
+        return new GetProductsByIdsResponseDTO(
+            items: array_map($this->toProductDTO(...), $products),
         );
     }
 
