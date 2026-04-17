@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Application\Service;
 
 use App\Application\Model\EmailJob;
+use App\Application\Model\EmailJobType;
 use App\Application\Queue\EmailQueueInterface;
 use App\Domain\Service\UuidGeneratorInterface;
-use App\Domain\ValueObject\EmailJobType;
 
 final class EmailQueueService
 {

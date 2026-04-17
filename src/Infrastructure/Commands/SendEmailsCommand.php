@@ -6,10 +6,6 @@ namespace App\Infrastructure\Commands;
 
 use App\Application\UseCase\Email\ProcessEmailQueueUseCase;
 use App\Domain\Repository\EmailJobRepositoryInterface;
-use App\Domain\Repository\OrderRepositoryInterface;
-use App\Application\Service\EmailQueueService;
-use App\Domain\Service\EmailServiceInterface;
-use App\Domain\ValueObject\EmailJobType;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

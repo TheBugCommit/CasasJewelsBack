@@ -6,18 +6,18 @@ namespace App\Application\UseCase\Order;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Mappers\OrderMapper;
+use App\Application\Service\OrderPaymentService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
-use App\Domain\Service\PaymentServiceInterface;
 use Sce\CasasJewelsVendor\DTO\Requests\CreateOrder\CreateOrderResponseDTO;
 
 final class RetryPaymentUseCase
 {
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly PaymentServiceInterface  $paymentService,
         private readonly OrderMapper              $orderMapper,
         private readonly UnitOfWorkInterface      $uow,
+        private readonly OrderPaymentService      $orderPaymentService,
     ) {}
 
     public function execute(string $orderId): CreateOrderResponseDTO
@@ -27,13 +27,8 @@ final class RetryPaymentUseCase
             throw OrderNotFoundException::withId($orderId);
         }
 
-        $paymentData = $this->paymentService->initiate(
-            $order->getId(),
-            $order->getClientEmail(),
-            $order->getTotalAmount()
-        );
+        $this->orderPaymentService->generatePaymentForOrder($order);
 
-        $order->assignPaymentDetails($paymentData['transactionId'], $paymentData['paymentUrl']);
         $this->orderRepository->save($order);
         $this->uow->commit();
 

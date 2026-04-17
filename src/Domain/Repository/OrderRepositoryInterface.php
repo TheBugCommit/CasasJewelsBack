@@ -2,8 +2,8 @@
 
 namespace App\Domain\Repository;
 
+use App\Application\Model\PaginatedOrderList;
 use App\Domain\Entity\Order;
-use App\Domain\Model\PaginatedOrderList;
 
 interface OrderRepositoryInterface
 {

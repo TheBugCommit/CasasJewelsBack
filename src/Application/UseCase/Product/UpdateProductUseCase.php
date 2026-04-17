@@ -26,7 +26,7 @@ final class UpdateProductUseCase
         float $price,
         string $description,
         string $category,
-        ?UploadedFile $image = null,
+        ?string $imageUrl = null,
     ): Product {
         $product = $this->products->findById($id);
 
@@ -38,11 +38,8 @@ final class UpdateProductUseCase
         $product->setPrice($price);
         $product->setDescription($description);
         $product->setCategory(ProductCategory::from($category));
-        if ($image !== null) {
-            if ($product->getImageUrl() !== null) {
-                $this->imageUpload->delete($product->getImageUrl());
-            }
-            $product->setImageUrl($this->imageUpload->upload($image));
+        if ($imageUrl !== null) {
+            $product->setImageUrl($imageUrl);
         }
 
         $this->products->save($product);

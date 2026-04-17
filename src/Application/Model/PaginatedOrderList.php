@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Model;
+namespace App\Application\Model;
 
 use App\Domain\Entity\Order;
 

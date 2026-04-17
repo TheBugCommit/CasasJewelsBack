@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Queue;
 
 use App\Application\Model\EmailJob;
-use App\Domain\ValueObject\EmailJobType;
+use App\Application\Model\EmailJobType;
 
 final class EmailJobMapper
 {

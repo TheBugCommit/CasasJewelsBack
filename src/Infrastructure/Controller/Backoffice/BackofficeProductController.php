@@ -119,13 +119,19 @@ class BackofficeProductController extends AbstractController
             return $this->redirectToRoute('admin_products');
         }
 
+        $imageUrl = null;
+        $imageFile = $request->files->get('image');
+        if ($imageFile !== null) {
+            $imageUrl = $this->imageUpload->upload($imageFile);
+        }
+
         $this->updateProduct->execute(
             id:          $id,
             name:        $name,
             price:       (float) $price,
             description: $description,
             category:    $category,
-            image:       $request->files->get('image'),
+            imageUrl:    $imageUrl,
         );
         try {
 

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Application\UseCase\Email;
 
 use App\Application\Model\EmailJob;
+use App\Application\Model\EmailJobType;
 use App\Application\Queue\EmailQueueInterface;
 use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Service\EmailServiceInterface;
-use App\Domain\ValueObject\EmailJobType;
 use Psr\Log\LoggerInterface;
 
 final class ProcessEmailQueueUseCase

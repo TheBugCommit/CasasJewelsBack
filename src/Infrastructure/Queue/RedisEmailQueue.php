@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace App\Infrastructure\Queue;
 
 use App\Application\Model\EmailJob;
+use App\Application\Model\EmailJobType;
 use App\Application\Queue\EmailQueueInterface;
-use App\Domain\ValueObject\EmailJobType;
 
 final class RedisEmailQueue implements EmailQueueInterface
 {

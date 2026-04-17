@@ -7,14 +7,15 @@ namespace App\Application\UseCase\Product;
 use App\Domain\Entity\Product;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
+use App\Domain\Service\UuidGeneratorInterface;
 use App\Domain\ValueObject\ProductCategory;
-use Symfony\Component\Uid\Uuid;
 
 final class CreateProductUseCase
 {
     public function __construct(
         private readonly ProductRepositoryInterface $products,
         private readonly UnitOfWorkInterface        $uow,
+        private readonly UuidGeneratorInterface     $uuidGenerator,
     ) {}
 
     public function execute(
@@ -25,7 +26,7 @@ final class CreateProductUseCase
         ?string $imageUrl = null,
     ): Product {
         $product = Product::create(
-            id:          Uuid::v4()->toRfc4122(),
+            id:          $this->uuidGenerator->generate(),
             name:        $name,
             price:       $price,
             description: $description,

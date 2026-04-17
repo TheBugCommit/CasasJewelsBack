@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Model;
 
-use App\Domain\ValueObject\EmailJobType;
-
 final class EmailJob
 {
     public const int MAX_RETRIES = 2;

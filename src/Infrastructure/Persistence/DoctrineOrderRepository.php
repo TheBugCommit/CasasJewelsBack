@@ -2,12 +2,11 @@
 
 namespace App\Infrastructure\Persistence;
 
+use App\Application\Model\PaginatedOrderList;
 use App\Domain\Entity\Order;
-use App\Domain\Model\PaginatedOrderList;
 use App\Domain\Repository\OrderRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use RuntimeException;
 
 final class DoctrineOrderRepository implements OrderRepositoryInterface
 {
