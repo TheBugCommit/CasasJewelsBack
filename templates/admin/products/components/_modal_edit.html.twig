@@ -30,6 +30,14 @@
                             <input type="file" name="image" id="editImage" class="form-control" accept="image/*">
                             <div id="editCurrentImage" class="mt-2"></div>
                         </div>
+                        <div class="col-md-6">
+                            <label for="editPreparationDays" class="form-label fw-semibold">Dies de preparació <span class="text-danger">*</span></label>
+                            <input type="number" name="preparation_days" id="editPreparationDays" class="form-control" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editShippingDays" class="form-label fw-semibold">Dies d'enviament <span class="text-danger">*</span></label>
+                            <input type="number" name="shipping_days" id="editShippingDays" class="form-control" min="0" required>
+                        </div>
                         <div class="col-12">
                             <label for="editDescription" class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
                             <textarea name="description" id="editDescription" class="form-control" rows="3" required></textarea>

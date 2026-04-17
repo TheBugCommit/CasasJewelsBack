@@ -11,6 +11,8 @@
         <field name="description" type="text"/>
         <field name="price" type="float"/>
         <field name="category" type="string" length="50" enum-type="App\Domain\ValueObject\ProductCategory"/>
-        <field name="imageUrl" type="string" length="500" nullable="true" column="image_url"/>
+        <field name="imageUrl"       type="string"  length="500" nullable="true" column="image_url"/>
+        <field name="preparationDays" type="integer" column="preparation_days"/>
+        <field name="shippingDays"    type="integer" column="shipping_days"/>
     </entity>
 </doctrine-mapping>

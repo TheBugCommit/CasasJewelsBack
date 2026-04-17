@@ -25,12 +25,14 @@ final class CreateProductUseCase
     public function execute(CreateProductRequestDTO $request): CreateProductResponseDTO
     {
         $product = Product::create(
-            id:          $this->uuidGenerator->generate(),
-            name:        $request->name,
-            price:       $request->price,
-            description: $request->description,
-            category:    ProductCategory::from($request->category),
-            imageUrl:    $request->imageUrl,
+            id:              $this->uuidGenerator->generate(),
+            name:            $request->name,
+            price:           $request->price,
+            description:     $request->description,
+            category:        ProductCategory::from($request->category),
+            imageUrl:        $request->imageUrl,
+            preparationDays: $request->preparationDays,
+            shippingDays:    $request->shippingDays,
         );
 
         $this->products->save($product);

@@ -6,6 +6,8 @@
         <th scope="col">Categoria</th>
         <th scope="col">Preu</th>
         <th scope="col">Descripció</th>
+        <th scope="col" class="text-center">Preparació</th>
+        <th scope="col" class="text-center">Enviament</th>
         <th scope="col" class="text-end">Accions</th>
     </tr>
     </thead>
@@ -27,6 +29,8 @@
             <td class="align-middle text-muted small text-truncate" style="max-width: 250px;" title="{{ product.description }}">
                 {{ product.description }}
             </td>
+            <td class="align-middle text-center small">{{ product.preparationDays }} d.</td>
+            <td class="align-middle text-center small">{{ product.shippingDays }} d.</td>
             <td class="align-middle text-end">
                 <div class="d-flex gap-2 justify-content-end">
                     <button class="btn btn-sm btn-outline-secondary js-edit-product"
@@ -38,6 +42,8 @@
                             data-description="{{ product.description|e('html_attr') }}"
                             data-category="{{ product.category }}"
                             data-image="{{ product.imageUrl }}"
+                            data-preparation-days="{{ product.preparationDays }}"
+                            data-shipping-days="{{ product.shippingDays }}"
                             data-csrf-token="{{ csrf_token('edit_product_' ~ product.id) }}">
                         <i class="fa-regular fa-pen-to-square"></i> Editar
                     </button>
@@ -53,7 +59,7 @@
         </tr>
     {% else %}
         <tr>
-            <td colspan="6" class="text-center text-muted py-4">No hi ha productes al catàleg.</td>
+            <td colspan="8" class="text-center text-muted py-4">No hi ha productes al catàleg.</td>
         </tr>
     {% endfor %}
     </tbody>

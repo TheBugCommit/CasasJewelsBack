@@ -59,12 +59,14 @@ final class ProductMapper
     private function toProductDTO(Product $product): ProductDTO
     {
         return new ProductDTO(
-            id:          $product->getId(),
-            name:        $product->getName(),
-            price:       $product->getPrice(),
-            description: $product->getDescription(),
-            category:    $product->getCategory()->value,
-            imageUrl:    $product->getImageUrl(),
+            id:              $product->getId(),
+            name:            $product->getName(),
+            price:           $product->getPrice(),
+            description:     $product->getDescription(),
+            category:        $product->getCategory()->value,
+            imageUrl:        $product->getImageUrl(),
+            preparationDays: $product->getPreparationDays(),
+            shippingDays:    $product->getShippingDays(),
         );
     }
 }

@@ -31,7 +31,9 @@ final class UpdateProductUseCase
             $request->name,
             $request->price,
             $request->description,
-            ProductCategory::from($request->category)
+            ProductCategory::from($request->category),
+            $request->preparationDays,
+            $request->shippingDays,
         );
 
         if ($request->imageUrl !== null) {

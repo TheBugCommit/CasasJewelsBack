@@ -12,6 +12,8 @@ class Product
     private string $description;
     private ProductCategory $category;
     private ?string $imageUrl;
+    private int $preparationDays;
+    private int $shippingDays;
 
     public function __construct(
         string $id,
@@ -20,13 +22,17 @@ class Product
         string $description,
         ProductCategory $category,
         ?string $imageUrl = null,
+        int $preparationDays = 0,
+        int $shippingDays = 0,
     ) {
-        $this->id          = $id;
-        $this->name        = $name;
-        $this->price       = $price;
-        $this->description = $description;
-        $this->category    = $category;
-        $this->imageUrl    = $imageUrl;
+        $this->id              = $id;
+        $this->name            = $name;
+        $this->price           = $price;
+        $this->description     = $description;
+        $this->category        = $category;
+        $this->imageUrl        = $imageUrl;
+        $this->preparationDays = $preparationDays;
+        $this->shippingDays    = $shippingDays;
     }
 
     public static function create(
@@ -36,15 +42,19 @@ class Product
         string $description,
         ProductCategory $category,
         ?string $imageUrl = null,
+        int $preparationDays = 0,
+        int $shippingDays = 0,
     ): self {
-        return new self($id, $name, $price, $description, $category, $imageUrl);
+        return new self($id, $name, $price, $description, $category, $imageUrl, $preparationDays, $shippingDays);
     }
 
     public function updateDetails(
         string $name,
         float $price,
         string $description,
-        ProductCategory $category
+        ProductCategory $category,
+        int $preparationDays,
+        int $shippingDays,
     ): void {
         if ($price <= 0) {
             throw new \DomainException("El preu d'un producte ha de ser positiu.");
@@ -54,10 +64,12 @@ class Product
             throw new \DomainException("El nom no pot estar buit.");
         }
 
-        $this->name = $name;
-        $this->price = $price;
-        $this->description = $description;
-        $this->category = $category;
+        $this->name            = $name;
+        $this->price           = $price;
+        $this->description     = $description;
+        $this->category        = $category;
+        $this->preparationDays = $preparationDays;
+        $this->shippingDays    = $shippingDays;
     }
 
     public function updateImage(string $imageUrl): void
@@ -124,4 +136,7 @@ class Product
         $this->imageUrl = $imageUrl;
         return $this;
     }
+
+    public function getPreparationDays(): int { return $this->preparationDays; }
+    public function getShippingDays(): int    { return $this->shippingDays; }
 }

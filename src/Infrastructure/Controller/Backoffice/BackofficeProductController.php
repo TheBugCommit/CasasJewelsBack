@@ -63,11 +63,13 @@ class BackofficeProductController extends AbstractController
 
         try {
             $dto = new CreateProductRequestDTO(
-                name:        trim($request->request->getString('name')),
-                price:       (float) $request->request->get('price'),
-                description: trim($request->request->getString('description')),
-                category:    $request->request->getString('category'),
-                imageUrl:    $this->uploadImageIfPresent($request),
+                name:            trim($request->request->getString('name')),
+                price:           (float) $request->request->get('price'),
+                description:     trim($request->request->getString('description')),
+                category:        $request->request->getString('category'),
+                preparationDays: $request->request->getInt('preparation_days'),
+                shippingDays:    $request->request->getInt('shipping_days'),
+                imageUrl:        $this->uploadImageIfPresent($request),
             );
 
             if (!$this->validateDto($dto)) {
@@ -93,12 +95,14 @@ class BackofficeProductController extends AbstractController
 
         try {
             $dto = new UpdateProductRequestDTO(
-                id:          $id,
-                name:        trim($request->request->getString('name')),
-                price:       (float) $request->request->get('price'),
-                description: trim($request->request->getString('description')),
-                category:    $request->request->getString('category'),
-                imageUrl:    $this->uploadImageIfPresent($request),
+                id:              $id,
+                name:            trim($request->request->getString('name')),
+                price:           (float) $request->request->get('price'),
+                description:     trim($request->request->getString('description')),
+                category:        $request->request->getString('category'),
+                preparationDays: $request->request->getInt('preparation_days'),
+                shippingDays:    $request->request->getInt('shipping_days'),
+                imageUrl:        $this->uploadImageIfPresent($request),
             );
 
             if (!$this->validateDto($dto)) {

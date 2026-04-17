@@ -22,7 +22,9 @@ class ProductFixture extends Fixture
                 'Anell d\'Or Blanc amb Diamant #' . ($i + 1),
                 1250.00 + ($i * 10),
                 'Anell elegant d\'or blanc de 18k amb un diamant de 0.5 quirats.',
-                ProductCategory::Ring
+                ProductCategory::Ring,
+                preparationDays: rand(1, 10),
+                shippingDays: rand(1, 10),
             );
 
             $manager->persist($product);

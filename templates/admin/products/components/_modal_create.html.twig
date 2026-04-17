@@ -30,6 +30,14 @@
                             <label for="createImage" class="form-label fw-semibold">Imatge</label>
                             <input type="file" name="image" id="createImage" class="form-control" accept="image/*">
                         </div>
+                        <div class="col-md-6">
+                            <label for="createPreparationDays" class="form-label fw-semibold">Dies de preparació <span class="text-danger">*</span></label>
+                            <input type="number" name="preparation_days" id="createPreparationDays" class="form-control" min="0" value="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="createShippingDays" class="form-label fw-semibold">Dies d'enviament <span class="text-danger">*</span></label>
+                            <input type="number" name="shipping_days" id="createShippingDays" class="form-control" min="0" value="0" required>
+                        </div>
                         <div class="col-12">
                             <label for="createDescription" class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
                             <textarea name="description" id="createDescription" class="form-control" rows="3" required></textarea>
