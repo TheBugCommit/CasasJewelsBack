@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Application\UseCase\Product;
 
 use App\Domain\Entity\Product;
+use App\Application\Exception\ProductNotFoundException;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\ValueObject\ProductCategory;
 use App\Infrastructure\Service\ProductImageUploadService;
-use DomainException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class UpdateProductUseCase
@@ -31,7 +31,7 @@ final class UpdateProductUseCase
         $product = $this->products->findById($id);
 
         if ($product === null) {
-            throw new DomainException("Producte amb ID {$id} no trobat.");
+            throw ProductNotFoundException::withId($id);
         }
 
         $product->setName($name);

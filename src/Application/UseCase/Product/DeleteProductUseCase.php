@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\Product;
 
+use App\Application\Exception\ProductNotFoundException;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
-use DomainException;
 
 final class DeleteProductUseCase
 {
@@ -20,7 +20,7 @@ final class DeleteProductUseCase
         $product = $this->products->findById($id);
 
         if ($product === null) {
-            throw new DomainException("Producte amb ID {$id} no trobat.");
+            throw ProductNotFoundException::withId($id);
         }
 
         $this->products->delete($product);
