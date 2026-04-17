@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'admin/components/_alerts.html.twig' as alerts %}
 
 {% block title %}Gestió de Productes{% endblock %}
 
@@ -11,227 +12,32 @@
             </button>
         </div>
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
+        {{ alerts.flash_messages(app.flashes) }}
 
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Imatge</th>
-                            <th>Nom</th>
-                            <th>Categoria</th>
-                            <th>Preu</th>
-                            <th>Descripció</th>
-                            <th class="text-end">Accions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for product in products %}
-                            <tr>
-                                <td class="align-middle" style="width: 80px;">
-                                    {% if product.imageUrl %}
-                                        <img src="{{ product.imageUrl }}" alt="{{ product.name }}" class="img-thumbnail" style="width:60px; height:60px; object-fit:cover;">
-                                    {% else %}
-                                        <span class="text-muted small">Sense imatge</span>
-                                    {% endif %}
-                                </td>
-                                <td class="align-middle fw-semibold">{{ product.name }}</td>
-                                <td class="align-middle">
-                                    <span class="badge bg-secondary">{{ product.category }}</span>
-                                </td>
-                                <td class="align-middle">{{ product.price|number_format(2, ',', '.') }} €</td>
-                                <td class="align-middle text-muted small" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    {{ product.description }}
-                                </td>
-                                <td class="align-middle text-end">
-                                    <div class="d-flex gap-2 justify-content-end">
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editProductModal"
-                                                data-id="{{ product.id }}"
-                                                data-name="{{ product.name }}"
-                                                data-price="{{ product.price }}"
-                                                data-description="{{ product.description|e('html_attr') }}"
-                                                data-category="{{ product.category }}"
-                                                data-image="{{ product.imageUrl }}"
-                                                data-csrf-token="{{ csrf_token('edit_product_' ~ product.id) }}">
-                                            <i class="fa-regular fa-pen-to-square"></i> Editar
-                                        </button>
-                                        <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}"
-                                              onsubmit="return confirm('Segur que vols eliminar «{{ product.name }}»?')">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fa-regular fa-trash-can"></i> Eliminar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">No hi ha productes al catàleg.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+                {% include 'admin/products/components/_table.html.twig' %}
 
                 {% if totalPages > 1 %}
-                    <div class="d-flex justify-content-center p-3">
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                {% for page in 1..totalPages %}
-                                    <li class="page-item {% if page == currentPage %}active{% endif %}">
-                                        <a class="page-link" href="{{ path('admin_products', {limit: currentLimit, offset: page}) }}">{{ page }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </nav>
-                    </div>
+                    {% include 'admin/components/_pagination.html.twig' with {
+                        'route': 'admin_products',
+                        'route_params': {'limit': currentLimit},
+                        'current_page': currentPage,
+                        'total_pages': totalPages
+                    } %}
                 {% endif %}
+
             </div>
         </div>
     </div>
 
-    {# Modal Crear Producte #}
-    <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form method="post" action="{{ path('admin_product_create') }}" enctype="multipart/form-data">
-                    <input type="hidden" name="_token" value="{{ csrf_token('create_product') }}">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createProductModalLabel">Nou Producte</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" required maxlength="255">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Preu (€) <span class="text-danger">*</span></label>
-                                <input type="number" name="price" class="form-control" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Categoria <span class="text-danger">*</span></label>
-                                <select name="category" class="form-select" required>
-                                    <option value="">-- Selecciona --</option>
-                                    {% for cat in categories %}
-                                        <option value="{{ cat.value }}">{{ cat.value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Imatge</label>
-                                <input type="file" name="image" class="form-control" accept="image/*">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
-                                <textarea name="description" class="form-control" rows="3" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="submit" class="btn btn-primary">Crear Producte</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% include 'admin/products/components/_modal_create.html.twig' %}
+    {% include 'admin/products/components/_modal_edit.html.twig' %}
 
-    {# Modal Editar Producte #}
-    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form method="post" id="editProductForm" enctype="multipart/form-data">
-                    <input type="hidden" name="_token" id="editCsrfToken">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProductModalLabel">Editar Producte</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="editName" class="form-control" required maxlength="255">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Preu (€) <span class="text-danger">*</span></label>
-                                <input type="number" name="price" id="editPrice" class="form-control" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Categoria <span class="text-danger">*</span></label>
-                                <select name="category" id="editCategory" class="form-select" required>
-                                    {% for cat in categories %}
-                                        <option value="{{ cat.value }}">{{ cat.value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nova imatge <span class="text-muted small">(opcional)</span></label>
-                                <input type="file" name="image" class="form-control" accept="image/*">
-                                <div id="editCurrentImage" class="mt-2"></div>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
-                                <textarea name="description" id="editDescription" class="form-control" rows="3" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="submit" class="btn btn-warning">Desar Canvis</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    const editModal = document.getElementById('editProductModal');
-    editModal.addEventListener('show.bs.modal', function (event) {
-        const btn = event.relatedTarget;
-        const id          = btn.dataset.id;
-        const name        = btn.dataset.name;
-        const price       = btn.dataset.price;
-        const description = btn.dataset.description;
-        const category    = btn.dataset.category;
-        const image       = btn.dataset.image;
-
-        const form = document.getElementById('editProductForm');
-        form.action = `/admin/products/${id}/edit`;
-
-        document.getElementById('editCsrfToken').value = btn.dataset.csrfToken || '';
-        document.getElementById('editName').value        = name;
-        document.getElementById('editPrice').value       = price;
-        document.getElementById('editDescription').value = description;
-
-        const categorySelect = document.getElementById('editCategory');
-        for (const opt of categorySelect.options) {
-            opt.selected = opt.value === category;
-        }
-
-        const imageDiv = document.getElementById('editCurrentImage');
-        if (image) {
-            imageDiv.innerHTML = `<img src="${image}" class="img-thumbnail" style="height:60px;" alt="Imatge actual"> <small class="text-muted">Imatge actual</small>`;
-        } else {
-            imageDiv.innerHTML = '<small class="text-muted">Sense imatge actual</small>';
-        }
-    });
-</script>
+    {{ parent() }}
+    <script src="{{ asset('js/product-modals.js') }}"></script>
 {% endblock %}

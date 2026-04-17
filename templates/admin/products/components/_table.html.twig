@@ -1,0 +1,60 @@
+<table class="table table-hover mb-0">
+    <thead class="table-dark">
+    <tr>
+        <th scope="col">Imatge</th>
+        <th scope="col">Nom</th>
+        <th scope="col">Categoria</th>
+        <th scope="col">Preu</th>
+        <th scope="col">Descripció</th>
+        <th scope="col" class="text-end">Accions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+        <tr>
+            <td class="align-middle" style="width: 80px;">
+                {% if product.imageUrl %}
+                    <img src="{{ product.imageUrl }}" alt="Imatge de {{ product.name }}" class="img-thumbnail" style="width:60px; height:60px; object-fit:cover;">
+                {% else %}
+                    <span class="text-muted small">Sense imatge</span>
+                {% endif %}
+            </td>
+            <td class="align-middle fw-semibold">{{ product.name }}</td>
+            <td class="align-middle">
+                <span class="badge bg-secondary">{{ product.category }}</span>
+            </td>
+            <td class="align-middle">{{ product.price|number_format(2, ',', '.') }} €</td>
+            <td class="align-middle text-muted small text-truncate" style="max-width: 250px;" title="{{ product.description }}">
+                {{ product.description }}
+            </td>
+            <td class="align-middle text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                    <button class="btn btn-sm btn-outline-secondary js-edit-product"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editProductModal"
+                            data-id="{{ product.id }}"
+                            data-name="{{ product.name }}"
+                            data-price="{{ product.price }}"
+                            data-description="{{ product.description|e('html_attr') }}"
+                            data-category="{{ product.category }}"
+                            data-image="{{ product.imageUrl }}"
+                            data-csrf-token="{{ csrf_token('edit_product_' ~ product.id) }}">
+                        <i class="fa-regular fa-pen-to-square"></i> Editar
+                    </button>
+
+                    <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}" class="js-delete-form" data-name="{{ product.name }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fa-regular fa-trash-can"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="6" class="text-center text-muted py-4">No hi ha productes al catàleg.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,46 @@
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="{{ path('admin_product_create') }}" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="{{ csrf_token('create_product') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProductModalLabel">Nou Producte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tancar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="createName" class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="createName" class="form-control" required maxlength="255">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="createPrice" class="form-label fw-semibold">Preu (€) <span class="text-danger">*</span></label>
+                            <input type="number" name="price" id="createPrice" class="form-control" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="createCategory" class="form-label fw-semibold">Categoria <span class="text-danger">*</span></label>
+                            <select name="category" id="createCategory" class="form-select" required>
+                                <option value="">-- Selecciona --</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.value }}">{{ cat.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="createImage" class="form-label fw-semibold">Imatge</label>
+                            <input type="file" name="image" id="createImage" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-12">
+                            <label for="createDescription" class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
+                            <textarea name="description" id="createDescription" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="submit" class="btn btn-primary">Crear Producte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

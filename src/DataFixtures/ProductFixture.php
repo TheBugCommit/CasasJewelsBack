@@ -16,7 +16,7 @@ class ProductFixture extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $product = Product::create(
                 $this->uuidGenerator->generate(),
                 'Anell d\'Or Blanc amb Diamant #' . ($i + 1),

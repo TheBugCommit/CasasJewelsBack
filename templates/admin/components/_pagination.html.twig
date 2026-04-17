@@ -1,0 +1,13 @@
+<div class="d-flex justify-content-center p-3">
+    <nav aria-label="Navegació de pàgines">
+        <ul class="pagination pagination-sm mb-0">
+            {% for page in 1..total_pages %}
+                <li class="page-item {% if page == current_page %}active{% endif %}" {% if page == current_page %}aria-current="page"{% endif %}>
+                    <a class="page-link" href="{{ path(route, route_params|merge({'offset': page})) }}">
+                        {{ page }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</div>

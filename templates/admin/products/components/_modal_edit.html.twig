@@ -1,0 +1,46 @@
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" id="editProductForm" enctype="multipart/form-data">
+                <input type="hidden" name="_token" id="editCsrfToken">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Editar Producte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tancar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="editName" class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="editName" class="form-control" required maxlength="255">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editPrice" class="form-label fw-semibold">Preu (€) <span class="text-danger">*</span></label>
+                            <input type="number" name="price" id="editPrice" class="form-control" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editCategory" class="form-label fw-semibold">Categoria <span class="text-danger">*</span></label>
+                            <select name="category" id="editCategory" class="form-select" required>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.value }}">{{ cat.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editImage" class="form-label fw-semibold">Nova imatge <span class="text-muted small">(opcional)</span></label>
+                            <input type="file" name="image" id="editImage" class="form-control" accept="image/*">
+                            <div id="editCurrentImage" class="mt-2"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="editDescription" class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
+                            <textarea name="description" id="editDescription" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="submit" class="btn btn-warning">Desar Canvis</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

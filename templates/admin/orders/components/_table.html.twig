@@ -1,69 +1,69 @@
+{% set badge_colors = {
+    'pending_payment': 'bg-secondary',
+    'paid': 'bg-warning text-dark',
+    'processing': 'bg-info text-dark',
+    'delivering': 'bg-primary',
+    'delivered': 'bg-success',
+    'cancelled': 'bg-danger',
+    'refound_pending': 'bg-warning text-dark'
+} %}
+
 <div class="table-responsive table-scrollable">
     <table class="table table-striped table-hover mb-0 align-middle" id="ordersTable">
         <thead class="table-dark sticky-top z-1">
         <tr>
-            <th class="ps-3">ID Comanda</th>
-            <th>Data de Creació</th>
-            <th>Nom del Client</th>
-            <th>Estat</th>
-            <th class="text-end pe-3">Accions</th>
+            <th scope="col" class="ps-3">ID Comanda</th>
+            <th scope="col">Data de Creació</th>
+            <th scope="col">Nom del Client</th>
+            <th scope="col">Estat</th>
+            <th scope="col" class="text-end pe-3">Accions</th>
         </tr>
         </thead>
         <tbody id="ordersTableBody">
         {% for order in orders %}
             <tr class="order-row">
-                <td class="ps-3 text-muted small col-id">{{ order.id }}</td>
+                <td class="ps-3 text-muted small col-id">{{ order.id|slice(0,18) }}...</td>
                 <td class="col-date">{{ order.createdAt|date('d/m/Y H:i') }}</td>
                 <td class="fw-bold col-name">{{ order.clientName }}</td>
-                <td class="col-status" data-status="{{ order.status|lower }}">
-                    <span class="badge rounded-pill
-                        {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Processing.value %}bg-info text-dark
-                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Delivering.value %}bg-primary
-                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Delivered.value %}bg-success
-                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value %}bg-danger
-                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').PendingPayment.value %}bg-secondary
-                        {% elseif order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Paid.value %}bg-warning
-                        {% else %}bg-secondary{% endif %}">
-                        {{ order.status|upper }}
-                    </span>
+
+                <td class="col-status" data-status="{{ order.status }}">
+                        <span class="badge rounded-pill {{ badge_colors[order.status]|default('bg-secondary') }}">
+                            {{ statusLabels[order.status]|default(order.status|upper) }}
+                        </span>
                 </td>
+
                 <td class="text-end pe-3">
-                    <a href="{{ path('admin_order_detail', { id: order.id }) }}" class="btn btn-sm btn-outline-primary me-1">
-                        <i class="bi bi-eye"></i> Veure Detall
-                    </a>
-                    {% for next_status in transitions[order.status]|default([]) %}
-                        {% if not (order.status == enum('App\\Domain\\ValueObject\\OrderStatus').RefundPending.value and next_status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value) %}
-                            <form
-                                action="{{ path('admin_order_update_status', { id: order.id, status: next_status }) }}"
-                                method="POST" class="d-inline">
-                                <input type="hidden" name="_token"
-                                       value="{{ csrf_token('update_status_' ~ order.id) }}">
+                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                        <a href="{{ path('admin_order_detail', { id: order.id }) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Detall
+                        </a>
 
-                                <button type="submit" class="btn btn-sm {{ buttonColors[next_status] }}">
-                                    {{ actionLabels[next_status] }}
-                                </button>
-                            </form>
+                        {% for next_status in transitions[order.status]|default([]) %}
+                            {% if not (order.status == 'refound_pending' and next_status == 'cancelled') %}
+                                <form action="{{ path('admin_order_update_status', { id: order.id, status: next_status }) }}" method="POST" class="m-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('update_status_' ~ order.id) }}">
+                                    <button type="submit" class="btn btn-sm {{ buttonColors[next_status] }}">
+                                        {{ actionLabels[next_status] }}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% endfor %}
 
+                        {% if order.status == 'refound_pending' %}
+                            <span class="text-muted small">
+                                    <em>Stripe... <div class="spinner-border spinner-border-sm text-secondary ms-1" role="status"></div></em>
+                                </span>
+                        {% elseif transitions[order.status]|default([]) is empty %}
+                            <span class="text-muted small">
+                                    <em>{% if order.status == 'cancelled' %}Cancel·lada{% else %}Completada{% endif %}</em>
+                                </span>
                         {% endif %}
-
-                    {% endfor %}
-
-                    {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').RefundPending.value %}
-                        <span class="text-muted small"><em>
-                                Esperant confirmació de Stripe<div class="spinner-border spinner-border-sm text-secondary ms-1" role="status"></div>
-                        </em></span>
-                    {% elseif transitions[order.status]|default([]) is empty %}
-                        <span class="text-muted small"><em>
-                        {% if order.status == enum('App\\Domain\\ValueObject\\OrderStatus').Cancelled.value %}Cancel·lada{% else %}Completada{% endif %}
-                    </em></span>
-                    {% endif %}
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr id="no-orders-row">
-                <td colspan="5" class="text-center py-4 text-muted">
-                    No s'ha trobat cap comanda.
-                </td>
+                <td colspan="5" class="text-center py-4 text-muted">No s'ha trobat cap comanda.</td>
             </tr>
         {% endfor %}
         </tbody>
