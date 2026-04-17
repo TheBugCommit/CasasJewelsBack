@@ -17,7 +17,6 @@ final class UpdateProductUseCase
     public function __construct(
         private readonly ProductRepositoryInterface $products,
         private readonly UnitOfWorkInterface        $uow,
-        private readonly ProductImageUploadService  $imageUpload,
     ) {}
 
     public function execute(

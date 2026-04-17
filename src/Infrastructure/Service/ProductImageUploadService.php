@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Service;
 
+use App\Domain\Service\UuidGeneratorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Uid\Uuid;
 
 final class ProductImageUploadService
 {
-    public function __construct(private readonly string $uploadDir) {}
+    public function __construct(
+        private readonly string $uploadDir,
+        private readonly UuidGeneratorInterface $uuidGenerator
+    ) {}
 
     public function upload(UploadedFile $file): string
     {
         $extension = $file->guessExtension() ?? 'jpg';
-        $filename  = Uuid::v4()->toRfc4122() . '.' . $extension;
+        $filename  = $this->uuidGenerator->generate() . '.' . $extension;
 
         $file->move($this->uploadDir, $filename);
 
