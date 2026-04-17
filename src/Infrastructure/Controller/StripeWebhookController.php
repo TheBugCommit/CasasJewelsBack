@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Controller;
 
+use App\Application\UseCase\Order\CancelAbandonedOrderUseCase;
 use App\Application\UseCase\Order\ConfirmOrderRefundedUseCase;
 use App\Application\UseCase\Order\MarkOrderAsPaidUseCase;
 use Psr\Log\LoggerInterface;
@@ -21,12 +22,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class StripeWebhookController extends AbstractController
 {
     public const CHECKOUT_COMPLETED = 'checkout.session.completed';
+    public const CHECKOUT_EXPIRED   = 'checkout.session.expired';
     public const REFUNDED           = 'charge.refunded';
 
     public function __construct(
         private readonly string                      $webhookSecret,
         private readonly MarkOrderAsPaidUseCase      $markOrderAsPaid,
         private readonly ConfirmOrderRefundedUseCase $confirmOrderRefunded,
+        private readonly CancelAbandonedOrderUseCase $cancelAbandonedOrder,
         private readonly LoggerInterface             $logger,
     ) {}
 
@@ -46,6 +49,7 @@ class StripeWebhookController extends AbstractController
         try {
             match ($event->type) {
                 self::CHECKOUT_COMPLETED => $this->handleCheckoutCompleted($event->data->object),
+                self::CHECKOUT_EXPIRED   => $this->handleCheckoutExpired($event->data->object),
                 self::REFUNDED           => $this->handleRefunded($event->data->object),
                 default                  => $this->logger->info("Event de Stripe ignorat: {$event->type}"),
             };
@@ -68,6 +72,19 @@ class StripeWebhookController extends AbstractController
 
         $this->markOrderAsPaid->execute(new MarkOrderAsPaidRequestDTO($orderId));
         $this->logger->info("Comanda pagada amb èxit via webhook: $orderId");
+    }
+
+    private function handleCheckoutExpired(object $session): void
+    {
+        $orderId = $session->metadata->order_id ?? null;
+
+        if (!$orderId) {
+            $this->logger->critical("Stripe Checkout Expired sense order_id al metadata! Session ID: {$session->id}");
+            return;
+        }
+
+        $this->cancelAbandonedOrder->execute($orderId);
+        $this->logger->info("Comanda abandonada eliminada: $orderId");
     }
 
     private function handleRefunded(object $charge): void

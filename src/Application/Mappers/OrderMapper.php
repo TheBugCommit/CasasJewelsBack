@@ -15,7 +15,6 @@ use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderDetailResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\RefundOrder\RefundOrderResponseDTO;
-use Sce\CasasJewelsVendor\DTO\Requests\RetryPayment\RetryPaymentResponseDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusResponseDTO;
 
 final class OrderMapper
@@ -56,15 +55,6 @@ final class OrderMapper
             status:  $order->getStatus()->value,
         );
     }
-
-    public function toRetryPaymentResponseDTO(Order $order): RetryPaymentResponseDTO
-    {
-        return new RetryPaymentResponseDTO(
-            transactionId: $order->getTransactionId(),
-            paymentUrl:    $order->getPaymentUrl(),
-        );
-    }
-
     public function toMarkOrderAsPaidResponseDTO(Order $order): MarkOrderAsPaidResponseDTO
     {
         return new MarkOrderAsPaidResponseDTO(

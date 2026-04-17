@@ -41,6 +41,7 @@ final class StripePaymentService implements PaymentServiceInterface
                 'quantity' => 1,
             ]],
             'mode'        => 'payment',
+            'expires_at'  => time() + 1800,
             'metadata'    => ['order_id' => $orderId],
             'payment_intent_data' => [
                 'metadata' => [

@@ -9,6 +9,7 @@ interface OrderRepositoryInterface
 {
     public function save(Order $order): void;
 
+    public function delete(Order $order): void;
     public function findById(string $id): Order|null;
     public function findByIds(array $ids): array;
 

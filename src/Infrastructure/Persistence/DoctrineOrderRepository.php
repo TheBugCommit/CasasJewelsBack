@@ -19,6 +19,11 @@ final class DoctrineOrderRepository implements OrderRepositoryInterface
         $this->em->persist($order);
     }
 
+    public function delete(Order $order): void
+    {
+        $this->em->remove($order);
+    }
+
     public function findById(string $id): Order|null
     {
         return $this->em->createQueryBuilder()
