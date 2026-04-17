@@ -3,12 +3,11 @@
 namespace App\Application\UseCase\Order;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Mappers\OrderMapper;
 use App\Application\Service\EmailQueueService;
 use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\ValueObject\OrderStatus;
-use App\Infrastructure\Api\Mapper\OrderMapper;
-use App\Infrastructure\Persistence\DoctrineUnitOfWork;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\UpdateOrder\UpdateOrderStatusResponseDTO;
 

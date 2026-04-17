@@ -2,8 +2,8 @@
 
 namespace App\Application\UseCase\Order;
 
+use App\Application\Mappers\OrderMapper;
 use App\Domain\Repository\OrderRepositoryInterface;
-use App\Infrastructure\Api\Mapper\OrderMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryOrder\GetOrderListResponseDTO;
 

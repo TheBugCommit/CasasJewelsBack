@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Api\Mapper;
+namespace App\Application\Mappers;
 
 use App\Domain\Entity\Order;
 use Sce\CasasJewelsVendor\DTO\Entity\OrderDTO;

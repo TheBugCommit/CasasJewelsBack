@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\Email;
 
-use App\Domain\Model\EmailJob;
-use App\Domain\Repository\EmailJobRepositoryInterface;
-use App\Domain\Repository\OrderRepositoryInterface;
+use App\Application\Model\EmailJob;
+use App\Application\Queue\EmailQueueInterface;
 use App\Application\Service\EmailQueueService;
+use App\Domain\Repository\OrderRepositoryInterface;
 use App\Domain\Service\EmailServiceInterface;
 use App\Domain\ValueObject\EmailJobType;
 use Psr\Log\LoggerInterface;
@@ -17,11 +17,11 @@ final class ProcessEmailQueueUseCase
     private const int MAX_EMAILS = 1000;
 
     public function __construct(
-        private readonly EmailJobRepositoryInterface $emailJobRepository,
-        private readonly EmailQueueService           $emailQueueService,
-        private readonly OrderRepositoryInterface    $orders,
-        private readonly EmailServiceInterface       $emailService,
-        private readonly LoggerInterface             $logger,
+        private readonly EmailQueueInterface      $emailQueue,
+        private readonly EmailQueueService        $emailQueueService,
+        private readonly OrderRepositoryInterface $orders,
+        private readonly EmailServiceInterface    $emailService,
+        private readonly LoggerInterface          $logger,
     ) {}
 
     /**
@@ -29,7 +29,7 @@ final class ProcessEmailQueueUseCase
      */
     public function execute(): array
     {
-        $jobs = $this->emailJobRepository->dequeueMultiple(ProcessEmailQueueUseCase::MAX_EMAILS);
+        $jobs = $this->emailQueue->popMultiple(ProcessEmailQueueUseCase::MAX_EMAILS);
         if (empty($jobs)) {
             return ['processed' => 0, 'failed' => 0];
         }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Model;
+namespace App\Application\Model;
 
 use App\Domain\ValueObject\EmailJobType;
 

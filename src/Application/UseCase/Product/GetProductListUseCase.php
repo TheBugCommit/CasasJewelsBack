@@ -2,8 +2,8 @@
 
 namespace App\Application\UseCase\Product;
 
+use App\Application\Mappers\ProductMapper;
 use App\Domain\Repository\ProductRepositoryInterface;
-use App\Infrastructure\Api\Mapper\ProductMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListResponseDTO;
 

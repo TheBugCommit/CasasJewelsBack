@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Application\Service;
 
-use App\Domain\Model\EmailJob;
-use App\Domain\Repository\EmailJobRepositoryInterface;
+use App\Application\Model\EmailJob;
+use App\Application\Queue\EmailQueueInterface;
 use App\Domain\Service\UuidGeneratorInterface;
 use App\Domain\ValueObject\EmailJobType;
 
 final class EmailQueueService
 {
     public function __construct(
-        private readonly EmailJobRepositoryInterface $emailJobRepository,
-        private readonly UuidGeneratorInterface      $uuidGenerator,
+        private readonly EmailQueueInterface    $emailQueue,
+        private readonly UuidGeneratorInterface $uuidGenerator,
     ) {}
 
     public function queueOrderCreated(string $orderId): void
     {
-        $this->emailJobRepository->enqueue(new EmailJob(
+        $this->emailQueue->push(new EmailJob(
             id:         $this->uuidGenerator->generate(),
             type:       EmailJobType::OrderCreated,
             orderId:    $orderId,
@@ -28,7 +28,7 @@ final class EmailQueueService
 
     public function queueOrderDelivering(string $orderId): void
     {
-        $this->emailJobRepository->enqueue(new EmailJob(
+        $this->emailQueue->push(new EmailJob(
             id:         $this->uuidGenerator->generate(),
             type:       EmailJobType::OrderDelivering,
             orderId:    $orderId,
@@ -38,7 +38,7 @@ final class EmailQueueService
 
     public function queueOrderDelivered(string $orderId): void
     {
-        $this->emailJobRepository->enqueue(new EmailJob(
+        $this->emailQueue->push(new EmailJob(
             id:         $this->uuidGenerator->generate(),
             type:       EmailJobType::OrderDelivered,
             orderId:    $orderId,
@@ -48,7 +48,7 @@ final class EmailQueueService
 
     public function queueOrderPaid(string $orderId): void
     {
-        $this->emailJobRepository->enqueue(new EmailJob(
+        $this->emailQueue->push(new EmailJob(
             id:         $this->uuidGenerator->generate(),
             type:       EmailJobType::OrderPaid,
             orderId:    $orderId,
@@ -58,7 +58,7 @@ final class EmailQueueService
 
     public function queueOrderCancelled(string $orderId): void
     {
-        $this->emailJobRepository->enqueue(new EmailJob(
+        $this->emailQueue->push(new EmailJob(
             id:         $this->uuidGenerator->generate(),
             type:       EmailJobType::OrderCancelled,
             orderId:    $orderId,
@@ -68,6 +68,6 @@ final class EmailQueueService
 
     public function requeue(EmailJob $job): void
     {
-        $this->emailJobRepository->enqueue($job->withIncrementedRetry());
+        $this->emailQueue->push($job->withIncrementedRetry());
     }
 }

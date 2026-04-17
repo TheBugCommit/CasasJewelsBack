@@ -3,8 +3,8 @@
 namespace App\Application\UseCase\Product;
 
 use App\Application\Exception\ProductNotFoundException;
+use App\Application\Mappers\ProductMapper;
 use App\Domain\Repository\ProductRepositoryInterface;
-use App\Infrastructure\Api\Mapper\ProductMapper;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductDetailRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductDetailResponseDTO;
 
