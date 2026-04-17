@@ -70,7 +70,7 @@ services:
     App\Domain\Service\PaymentServiceInterface:
         alias: App\Infrastructure\Service\StripePaymentService
 
-    App\Infrastructure\Controller\PaymentWebhookController:
+    App\Infrastructure\Controller\StripeWebhookController:
         arguments:
             $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
