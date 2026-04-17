@@ -9,22 +9,29 @@ final class LayeredCache
         private readonly CacheInterface $redis,
     ) {}
 
-    public function get(
-        string   $key,
-        int      $apCuTtl,
-    ): mixed {
-        $value = $this->apcu->get($key);
-        if ($value !== null) {
-            return $value;
+    public function get(string $key, int $apCuTtl): mixed
+    {
+        if ($apCuTtl > 0) {
+            $value = $this->apcu->get($key);
+            if ($value !== null) {
+                return $value;
+            }
         }
 
         $value = $this->redis->get($key);
-        if ($value !== null) {
+        if ($value !== null && $apCuTtl > 0) {
             $this->apcu->set($key, $value, $apCuTtl);
-            return $value;
         }
 
-        return null;
+        return $value;
+    }
+
+    public function set(string $key, mixed $value, int $apCuTtl, int $redisTtl): void
+    {
+        if ($apCuTtl > 0) {
+            $this->apcu->set($key, $value, $apCuTtl);
+        }
+        $this->redis->set($key, $value, $redisTtl);
     }
 
     public function getGlobal(string $key): mixed
@@ -36,12 +43,6 @@ final class LayeredCache
     {
         $this->redis->set($key, $value, $ttl);
         $this->apcu->delete($key);
-    }
-
-    public function set(string $key, mixed $value, int $apCuTtl, int $redisTtl): void
-    {
-        $this->apcu->set($key, $value, $apCuTtl);
-        $this->redis->set($key, $value, $redisTtl);
     }
 
     public function getMultiple(array $keys, int $apCuTtl): array

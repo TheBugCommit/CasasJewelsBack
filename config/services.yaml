@@ -44,8 +44,16 @@ services:
     App\Infrastructure\Persistence\CachedProductRepository:
         arguments:
             $inner: '@App\Infrastructure\Persistence\DoctrineProductRepository'
-    App\Domain\Repository\ProductRepositoryInterface:
-        alias: App\Infrastructure\Persistence\CachedProductRepository
+
+    App\Domain\Repository\ProductRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineProductRepository'
+
+    App\Application\UseCase\Product\GetProductListUseCase:
+        arguments:
+            $products: '@App\Infrastructure\Persistence\CachedProductRepository'
+
+    App\Application\UseCase\Product\GetProductDetailUseCase:
+        arguments:
+            $products: '@App\Infrastructure\Persistence\CachedProductRepository'
 
     App\Infrastructure\Cache\LayeredCache:
         arguments:

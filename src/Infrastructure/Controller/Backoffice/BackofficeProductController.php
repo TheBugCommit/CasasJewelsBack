@@ -7,6 +7,7 @@ namespace App\Infrastructure\Controller\Backoffice;
 use App\Application\UseCase\Product\CreateProductUseCase;
 use App\Application\UseCase\Product\DeleteProductUseCase;
 use App\Application\UseCase\Product\GetProductListUseCase;
+use App\Application\UseCase\Product\UpdateProductUseCase;
 use App\Domain\ValueObject\ProductCategory;
 use App\Infrastructure\Service\ProductImageUploadService;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
@@ -23,6 +24,7 @@ class BackofficeProductController extends AbstractController
     public function __construct(
         private readonly GetProductListUseCase      $getProductList,
         private readonly CreateProductUseCase       $createProduct,
+        private readonly UpdateProductUseCase       $updateProduct,
         private readonly DeleteProductUseCase       $deleteProduct,
         private readonly ProductImageUploadService  $imageUpload,
     ) {}
@@ -87,6 +89,51 @@ class BackofficeProductController extends AbstractController
             $this->addFlash('success', "Producte '{$name}' creat correctament.");
         } catch (\Exception) {
             $this->addFlash('error', 'Error en crear el producte.');
+        }
+
+        return $this->redirectToRoute('admin_products');
+    }
+
+    #[Route('/{id}/edit', name: 'admin_product_edit', methods: ['POST'])]
+    public function edit(string $id, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('edit_product_' . $id, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Petició no vàlida (CSRF Token incorrecte).');
+            return $this->redirectToRoute('admin_products');
+        }
+
+        $name        = trim($request->request->getString('name'));
+        $price       = $request->request->get('price');
+        $description = trim($request->request->getString('description'));
+        $category    = $request->request->getString('category');
+
+        if (!$name || !$price || !$description || !$category) {
+            $this->addFlash('error', 'Tots els camps són obligatoris.');
+            return $this->redirectToRoute('admin_products');
+        }
+
+        try {
+            ProductCategory::from($category);
+        } catch (\ValueError) {
+            $this->addFlash('error', 'Categoria no vàlida.');
+            return $this->redirectToRoute('admin_products');
+        }
+
+        $this->updateProduct->execute(
+            id:          $id,
+            name:        $name,
+            price:       (float) $price,
+            description: $description,
+            category:    $category,
+            image:       $request->files->get('image'),
+        );
+        try {
+
+            $this->addFlash('success', "Producte '{$name}' actualitzat correctament.");
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        } catch (\Exception) {
+            $this->addFlash('error', 'Error en actualitzar el producte.');
         }
 
         return $this->redirectToRoute('admin_products');

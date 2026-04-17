@@ -56,13 +56,27 @@
                                     {{ product.description }}
                                 </td>
                                 <td class="align-middle text-end">
-                                    <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}"
-                                          onsubmit="return confirm('Segur que vols eliminar «{{ product.name }}»?')">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editProductModal"
+                                                data-id="{{ product.id }}"
+                                                data-name="{{ product.name }}"
+                                                data-price="{{ product.price }}"
+                                                data-description="{{ product.description|e('html_attr') }}"
+                                                data-category="{{ product.category }}"
+                                                data-image="{{ product.imageUrl }}"
+                                                data-csrf-token="{{ csrf_token('edit_product_' ~ product.id) }}">
+                                            <i class="fa-regular fa-pen-to-square"></i> Editar
                                         </button>
-                                    </form>
+                                        <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}"
+                                              onsubmit="return confirm('Segur que vols eliminar «{{ product.name }}»?')">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fa-regular fa-trash-can"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
@@ -90,6 +104,7 @@
         </div>
     </div>
 
+    {# Modal Crear Producte #}
     <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -136,4 +151,87 @@
             </div>
         </div>
     </div>
+
+    {# Modal Editar Producte #}
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="post" id="editProductForm" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" id="editCsrfToken">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProductModalLabel">Editar Producte</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="editName" class="form-control" required maxlength="255">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Preu (€) <span class="text-danger">*</span></label>
+                                <input type="number" name="price" id="editPrice" class="form-control" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Categoria <span class="text-danger">*</span></label>
+                                <select name="category" id="editCategory" class="form-select" required>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.value }}">{{ cat.value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nova imatge <span class="text-muted small">(opcional)</span></label>
+                                <input type="file" name="image" class="form-control" accept="image/*">
+                                <div id="editCurrentImage" class="mt-2"></div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Descripció <span class="text-danger">*</span></label>
+                                <textarea name="description" id="editDescription" class="form-control" rows="3" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                        <button type="submit" class="btn btn-warning">Desar Canvis</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    const editModal = document.getElementById('editProductModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        const btn = event.relatedTarget;
+        const id          = btn.dataset.id;
+        const name        = btn.dataset.name;
+        const price       = btn.dataset.price;
+        const description = btn.dataset.description;
+        const category    = btn.dataset.category;
+        const image       = btn.dataset.image;
+
+        const form = document.getElementById('editProductForm');
+        form.action = `/admin/products/${id}/edit`;
+
+        document.getElementById('editCsrfToken').value = btn.dataset.csrfToken || '';
+        document.getElementById('editName').value        = name;
+        document.getElementById('editPrice').value       = price;
+        document.getElementById('editDescription').value = description;
+
+        const categorySelect = document.getElementById('editCategory');
+        for (const opt of categorySelect.options) {
+            opt.selected = opt.value === category;
+        }
+
+        const imageDiv = document.getElementById('editCurrentImage');
+        if (image) {
+            imageDiv.innerHTML = `<img src="${image}" class="img-thumbnail" style="height:60px;" alt="Imatge actual"> <small class="text-muted">Imatge actual</small>`;
+        } else {
+            imageDiv.innerHTML = '<small class="text-muted">Sense imatge actual</small>';
+        }
+    });
+</script>
 {% endblock %}
