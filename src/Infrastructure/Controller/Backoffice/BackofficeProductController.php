@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Controller\Backoffice;
 
+use App\Application\Exception\ProductNotFoundException;
 use App\Application\UseCase\Product\CreateProductUseCase;
 use App\Application\UseCase\Product\DeleteProductUseCase;
 use App\Application\UseCase\Product\GetProductListUseCase;
 use App\Application\UseCase\Product\UpdateProductUseCase;
 use App\Domain\ValueObject\ProductCategory;
 use App\Infrastructure\Service\ProductImageUploadService;
+use Sce\CasasJewelsVendor\DTO\Requests\CreateProduct\CreateProductRequestDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\DeleteProduct\DeleteProductRequestDTO;
 use Sce\CasasJewelsVendor\DTO\Requests\QueryProducts\GetProductListRequestDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\UpdateProduct\UpdateProductRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/admin/products')]
 class BackofficeProductController extends AbstractController
@@ -22,11 +27,12 @@ class BackofficeProductController extends AbstractController
     private const CSRF_DELETE = 'delete_product_';
 
     public function __construct(
-        private readonly GetProductListUseCase      $getProductList,
-        private readonly CreateProductUseCase       $createProduct,
-        private readonly UpdateProductUseCase       $updateProduct,
-        private readonly DeleteProductUseCase       $deleteProduct,
-        private readonly ProductImageUploadService  $imageUpload,
+        private readonly GetProductListUseCase     $getProductList,
+        private readonly CreateProductUseCase      $createProduct,
+        private readonly UpdateProductUseCase      $updateProduct,
+        private readonly DeleteProductUseCase      $deleteProduct,
+        private readonly ProductImageUploadService $imageUpload,
+        private readonly ValidatorInterface        $validator,
     ) {}
 
     #[Route('', name: 'admin_products', methods: ['GET'])]
@@ -35,12 +41,12 @@ class BackofficeProductController extends AbstractController
         $limit  = $request->query->getInt('limit', 10);
         $offset = $request->query->getInt('offset', 1);
 
-        $responseDTO = $this->getProductList->execute(new GetProductListRequestDTO($limit, $offset));
+        $response = $this->getProductList->execute(new GetProductListRequestDTO($limit, $offset));
 
         return $this->render('admin/products/index.html.twig', [
-            'products'     => $responseDTO->items,
-            'total'        => $responseDTO->total,
-            'totalPages'   => $responseDTO->totalPages,
+            'products'     => $response->items,
+            'total'        => $response->total,
+            'totalPages'   => $response->totalPages,
             'currentLimit' => $limit,
             'currentPage'  => $offset,
             'categories'   => ProductCategory::cases(),
@@ -55,40 +61,23 @@ class BackofficeProductController extends AbstractController
             return $this->redirectToRoute('admin_products');
         }
 
-        $name        = trim($request->request->getString('name'));
-        $price       = $request->request->get('price');
-        $description = trim($request->request->getString('description'));
-        $category    = $request->request->getString('category');
-
-        if (!$name || !$price || !$description || !$category) {
-            $this->addFlash('error', 'Tots els camps són obligatoris.');
-            return $this->redirectToRoute('admin_products');
-        }
-
         try {
-            ProductCategory::from($category);
-        } catch (\ValueError) {
-            $this->addFlash('error', 'Categoria no vàlida.');
-            return $this->redirectToRoute('admin_products');
-        }
-
-        $imageUrl = null;
-        $imageFile = $request->files->get('image');
-        if ($imageFile !== null) {
-            $imageUrl = $this->imageUpload->upload($imageFile);
-        }
-
-        try {
-            $this->createProduct->execute(
-                name:        $name,
-                price:       (float) $price,
-                description: $description,
-                category:    $category,
-                imageUrl:    $imageUrl,
+            $dto = new CreateProductRequestDTO(
+                name:        trim($request->request->getString('name')),
+                price:       (float) $request->request->get('price'),
+                description: trim($request->request->getString('description')),
+                category:    $request->request->getString('category'),
+                imageUrl:    $this->uploadImageIfPresent($request),
             );
-            $this->addFlash('success', "Producte '{$name}' creat correctament.");
-        } catch (\Exception) {
-            $this->addFlash('error', 'Error en crear el producte.');
+
+            if (!$this->validateDto($dto)) {
+                return $this->redirectToRoute('admin_products');
+            }
+
+            $response = $this->createProduct->execute($dto);
+            $this->addFlash('success', "Producte '{$response->data->name}' creat correctament.");
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('admin_products');
@@ -102,41 +91,23 @@ class BackofficeProductController extends AbstractController
             return $this->redirectToRoute('admin_products');
         }
 
-        $name        = trim($request->request->getString('name'));
-        $price       = $request->request->get('price');
-        $description = trim($request->request->getString('description'));
-        $category    = $request->request->getString('category');
-
-        if (!$name || !$price || !$description || !$category) {
-            $this->addFlash('error', 'Tots els camps són obligatoris.');
-            return $this->redirectToRoute('admin_products');
-        }
-
         try {
-            ProductCategory::from($category);
-        } catch (\ValueError) {
-            $this->addFlash('error', 'Categoria no vàlida.');
-            return $this->redirectToRoute('admin_products');
-        }
+            $dto = new UpdateProductRequestDTO(
+                id:          $id,
+                name:        trim($request->request->getString('name')),
+                price:       (float) $request->request->get('price'),
+                description: trim($request->request->getString('description')),
+                category:    $request->request->getString('category'),
+                imageUrl:    $this->uploadImageIfPresent($request),
+            );
 
-        $imageUrl = null;
-        $imageFile = $request->files->get('image');
-        if ($imageFile !== null) {
-            $imageUrl = $this->imageUpload->upload($imageFile);
-        }
+            if (!$this->validateDto($dto)) {
+                return $this->redirectToRoute('admin_products');
+            }
 
-        $this->updateProduct->execute(
-            id:          $id,
-            name:        $name,
-            price:       (float) $price,
-            description: $description,
-            category:    $category,
-            imageUrl:    $imageUrl,
-        );
-        try {
-
-            $this->addFlash('success', "Producte '{$name}' actualitzat correctament.");
-        } catch (\DomainException $e) {
+            $response = $this->updateProduct->execute($dto);
+            $this->addFlash('success', "Producte '{$response->data->name}' actualitzat correctament.");
+        } catch (ProductNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
         } catch (\Exception) {
             $this->addFlash('error', 'Error en actualitzar el producte.');
@@ -154,14 +125,34 @@ class BackofficeProductController extends AbstractController
         }
 
         try {
-            $this->deleteProduct->execute($id);
+            $this->deleteProduct->execute(new DeleteProductRequestDTO($id));
             $this->addFlash('success', 'Producte eliminat correctament.');
-        } catch (\DomainException $e) {
+        } catch (ProductNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
         } catch (\Exception) {
             $this->addFlash('error', 'Error en eliminar el producte.');
         }
 
         return $this->redirectToRoute('admin_products');
+    }
+
+    private function uploadImageIfPresent(Request $request): ?string
+    {
+        $imageFile = $request->files->get('image');
+        return $imageFile !== null ? $this->imageUpload->upload($imageFile) : null;
+    }
+
+    private function validateDto(object $dto): bool
+    {
+        $errors = $this->validator->validate($dto);
+
+        if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+            return false;
+        }
+
+        return true;
     }
 }

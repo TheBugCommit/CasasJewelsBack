@@ -40,6 +40,31 @@ class Product
         return new self($id, $name, $price, $description, $category, $imageUrl);
     }
 
+    public function updateDetails(
+        string $name,
+        float $price,
+        string $description,
+        ProductCategory $category
+    ): void {
+        if ($price <= 0) {
+            throw new \DomainException("El preu d'un producte ha de ser positiu.");
+        }
+
+        if (trim($name) === '') {
+            throw new \DomainException("El nom no pot estar buit.");
+        }
+
+        $this->name = $name;
+        $this->price = $price;
+        $this->description = $description;
+        $this->category = $category;
+    }
+
+    public function updateImage(string $imageUrl): void
+    {
+        $this->imageUrl = $imageUrl;
+    }
+
     public function getId(): string
     {
         return $this->id;

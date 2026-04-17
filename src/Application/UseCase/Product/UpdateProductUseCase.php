@@ -1,49 +1,46 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Application\UseCase\Product;
 
-use App\Domain\Entity\Product;
 use App\Application\Exception\ProductNotFoundException;
+use App\Application\Mappers\ProductMapper;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\Repository\UnitOfWorkInterface;
 use App\Domain\ValueObject\ProductCategory;
-use App\Infrastructure\Service\ProductImageUploadService;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Sce\CasasJewelsVendor\DTO\Requests\UpdateProduct\UpdateProductRequestDTO;
+use Sce\CasasJewelsVendor\DTO\Requests\UpdateProduct\UpdateProductResponseDTO;
 
 final class UpdateProductUseCase
 {
     public function __construct(
         private readonly ProductRepositoryInterface $products,
+        private readonly ProductMapper              $productMapper,
         private readonly UnitOfWorkInterface        $uow,
     ) {}
 
-    public function execute(
-        string $id,
-        string $name,
-        float $price,
-        string $description,
-        string $category,
-        ?string $imageUrl = null,
-    ): Product {
-        $product = $this->products->findById($id);
+    public function execute(UpdateProductRequestDTO $request): UpdateProductResponseDTO
+    {
+        $product = $this->products->findById($request->id);
 
         if ($product === null) {
-            throw ProductNotFoundException::withId($id);
+            throw ProductNotFoundException::withId($request->id);
         }
 
-        $product->setName($name);
-        $product->setPrice($price);
-        $product->setDescription($description);
-        $product->setCategory(ProductCategory::from($category));
-        if ($imageUrl !== null) {
-            $product->setImageUrl($imageUrl);
+        $product->updateDetails(
+            $request->name,
+            $request->price,
+            $request->description,
+            ProductCategory::from($request->category)
+        );
+
+        if ($request->imageUrl !== null) {
+            $product->updateImage($request->imageUrl);
         }
 
         $this->products->save($product);
         $this->uow->commit();
 
-        return $product;
+        return $this->productMapper->toUpdateProductResponseDTO($product);
     }
 }
