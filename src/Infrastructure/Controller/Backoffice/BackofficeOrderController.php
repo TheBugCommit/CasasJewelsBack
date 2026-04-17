@@ -25,35 +25,6 @@ class BackofficeOrderController extends AbstractController
 {
     private const CSRF_PREFIX = 'update_status_';
 
-    private const STATUS_LABELS = [
-        OrderStatus::PendingPayment->value => 'Pendent de Pagament',
-        OrderStatus::Paid->value           => 'Pagat',
-        OrderStatus::Processing->value     => 'Processant',
-        OrderStatus::Delivering->value     => 'Enviant',
-        OrderStatus::Delivered->value      => 'Lliurat',
-        OrderStatus::Cancelled->value      => 'Cancel·lada',
-        OrderStatus::RefundPending->value  => 'Reemborsament en curs...',
-    ];
-
-    private const ACTION_LABELS = [
-        OrderStatus::Processing->value    => 'Començar a processar',
-        OrderStatus::Paid->value          => 'Marcar com a Pagat (Manual)',
-        OrderStatus::Delivering->value    => 'Enviar comanda',
-        OrderStatus::Delivered->value     => 'Marcar com lliurada',
-        OrderStatus::RefundPending->value => 'Cancel·lar i Reemborsar',
-        OrderStatus::Cancelled->value     => 'Forçar Cancel·lació',
-    ];
-
-    private const BUTTON_COLORS = [
-        OrderStatus::PendingPayment->value => 'btn-outline-secondary',
-        OrderStatus::Paid->value           => 'btn-outline-warning',
-        OrderStatus::Processing->value     => 'btn-outline-info',
-        OrderStatus::Delivering->value     => 'btn-outline-primary',
-        OrderStatus::Delivered->value      => 'btn-outline-success',
-        OrderStatus::RefundPending->value  => 'btn-outline-danger',
-        OrderStatus::Cancelled->value      => 'btn-outline-dark',
-    ];
-
     public function __construct(
         private readonly GetOrderListUseCase      $getOrderList,
         private readonly UpdateOrderStatusUseCase $updateOrderStatus,
@@ -68,14 +39,7 @@ class BackofficeOrderController extends AbstractController
         $limit  = $request->query->getInt('limit', 10);
         $offset = $request->query->getInt('offset', 1);
 
-        $response    = $this->getOrderList->execute(new GetOrderListRequestDTO($limit, $offset));
-        $transitions = [];
-        foreach (OrderStatus::cases() as $status) {
-            $transitions[$status->value] = array_map(
-                fn($next) => $next->value,
-                $status->allowedTransitions()
-            );
-        }
+        $response = $this->getOrderList->execute(new GetOrderListRequestDTO($limit, $offset));
 
         return $this->render('/admin/orders/index.html.twig', [
             'orders'       => $response->items,
@@ -83,10 +47,6 @@ class BackofficeOrderController extends AbstractController
             'totalPages'   => $response->totalPages,
             'currentLimit' => $limit,
             'currentPage'  => $offset,
-            'transitions'  => $transitions,
-            'statusLabels' => self::STATUS_LABELS,
-            'actionLabels' => self::ACTION_LABELS,
-            'buttonColors' => self::BUTTON_COLORS,
         ]);
     }
 

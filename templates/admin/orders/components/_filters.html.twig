@@ -13,11 +13,13 @@
                 <label for="filterStatus" class="form-label small fw-bold text-muted">Estat</label>
                 <select id="filterStatus" class="form-select form-select-sm">
                     <option value="">Tots els estats</option>
-                    {% for statusValue, statusLabel in statusLabels %}
+
+                    {% for statusValue in order_all_statuses() %}
                         <option value="{{ statusValue }}">
-                            {{ statusValue|capitalize }} ({{ statusLabel }})
+                            {{ order_status_label(statusValue) }}
                         </option>
                     {% endfor %}
+
                 </select>
             </div>
             <div class="col-md-3">
