@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         editModal.addEventListener('show.bs.modal', function (event) {
             const btn = event.relatedTarget;
             const dataset = btn.dataset;
-
+            console.log(dataset);
             const form = document.getElementById('editProductForm');
             form.action = `/admin/products/${dataset.id}/edit`;
 
@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editName').value        = dataset.name;
             document.getElementById('editPrice').value       = dataset.price;
             document.getElementById('editDescription').value = dataset.description;
+            document.getElementById('editShippingDays').value = dataset.shippingDays;
+            document.getElementById('editPreparationDays').value = dataset.preparationDays;
 
             const categorySelect = document.getElementById('editCategory');
             Array.from(categorySelect.options).forEach(opt => {

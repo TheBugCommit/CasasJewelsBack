@@ -32,6 +32,7 @@ final class MarkOrderAsPaidUseCase
         $order->transitionTo(OrderStatus::Paid);
         $this->orders->save($order);
         $this->uow->commit();
+
         $this->emailQueueService->queueOrderPaid($request->orderId);
 
         return $this->orderMapper->toMarkOrderAsPaidResponseDTO($order);

@@ -31,8 +31,9 @@ final class ConfirmOrderRefundedUseCase
 
         $order->transitionTo(OrderStatus::Cancelled);
         $this->orderRepository->save($order);
-        $this->emailQueueService->queueOrderCancelled($order->getId());
         $this->uow->commit();
+
+        $this->emailQueueService->queueOrderCancelled($order->getId());
 
         return $this->orderMapper->toConfirmOrderRefundedResponseDTO($order);
     }
